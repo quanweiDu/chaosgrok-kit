@@ -1,8 +1,7 @@
 /* ============================================================
    字体加载 — 优先 Google Fonts，降级到本地衬线字体
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400&display=swap&font-display=swap');
 /* ============================================================
    CSS 变量
    ============================================================ */
