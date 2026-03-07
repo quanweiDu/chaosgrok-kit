@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BackBtn from '../../components/BackBtn.astro';
+import ReadingProgress from '../../components/ReadingProgress.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+const dateStr = post.data.pubDate.toISOString().slice(0, 10).replace(/-/g, '.');
+---
+
+<Layout
+  title={post.data.title}
+  description={post.data.description ?? post.data.descriptionZh ?? ''}
+>
+  <ReadingProgress />
+
+  <div class="article-page fade-1">
+
+    <div class="article-meta-top">
+      <BackBtn text="Writing" href="/blog" />
+      <div class="meta-divider"></div>
+      <span class="article-date-str">{dateStr}</span>
+    </div>
+
+    <h1 class="article-h1">{post.data.title}</h1>
+    {post.data.titleZh && (
+      <p class="article-h1-zh">{post.data.titleZh}</p>
+    )}
+
+    <div class="article-body">
+      <Content />
+    </div>
+
+    {post.data.audio && (
+      <div class="article-audio">
+        <span class="audio-label">配乐</span>
+        <audio controls preload="none">
+          <source src={`/music/${post.data.audio}`} type="audio/mpeg">
+        </audio>
+      </div>
+    )}
+
+  </div>
+
+</Layout>
+
+<style>
+  .article-audio {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .audio-label {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    white-space: nowrap;
+  }
+
+  audio {
+    flex: 1;
+    height: 32px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  audio:hover { opacity: 1; }
+</style>

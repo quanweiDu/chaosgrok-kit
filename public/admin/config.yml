@@ -1,0 +1,89 @@
+backend:
+  name: github
+  repo: quanweiDu/chaosgrok
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+
+  - name: tracks
+    label: "🎵 Music 音乐"
+    folder: src/content/tracks
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "编号", name: num, widget: string, hint: "如 01、02、03，决定播放顺序" }
+      - { label: "歌曲名", name: name, widget: string }
+      - { label: "文件名", name: file, widget: string, hint: "如 track1.mp3，文件放在 public/music/ 文件夹里" }
+
+  - name: blog
+    label: "📝 Writing"
+    folder: src/content/blog
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "英文标题", name: title, widget: string }
+      - { label: "中文标题（可选）", name: titleZh, widget: string, required: false }
+      - { label: "发布日期", name: pubDate, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "英文简介（可选）", name: description, widget: string, required: false }
+      - { label: "中文简介（可选）", name: descriptionZh, widget: string, required: false }
+      - { label: "正文", name: body, widget: markdown }
+      - label: "配乐（可选）"
+        name: audio
+        widget: string
+        required: false
+        hint: "填写文件名即可，如 track1.mp3，文件放在 public/music/ 文件夹里"
+
+  - name: links
+    label: "🔗 Links 导航"
+    folder: src/content/links
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "网站名称", name: title, widget: string }
+      - { label: "链接地址", name: url, widget: string, hint: "完整链接，如 https://example.com" }
+      - { label: "一句话描述", name: description, widget: string, required: false }
+      - label: "分类"
+        name: category
+        widget: select
+        options: ["设计", "工具", "阅读", "思考", "其他"]
+      - label: "类型"
+        name: personal
+        widget: select
+        options:
+          - { label: "自用收藏", value: "true" }
+          - { label: "推荐给读者", value: "false" }
+        default: "false"
+
+  - name: books
+    label: "📚 Books"
+    folder: src/content/books
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "英文书名", name: title, widget: string }
+      - { label: "中文书名（可选）", name: titleZh, widget: string, required: false }
+      - { label: "价格", name: price, widget: string, hint: "如 $19.99" }
+      - { label: "购买链接 (Gumroad)", name: buyLink, widget: string }
+      - { label: "英文简介", name: description, widget: string }
+      - { label: "中文简介（可选）", name: descriptionZh, widget: string, required: false }
+      - { label: "书籍详情", name: body, widget: markdown }
+
+  - name: videos
+    label: "🎬 Video 视频"
+    folder: src/content/videos
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "英文标题", name: title, widget: string }
+      - { label: "中文标题（可选）", name: titleZh, widget: string, required: false }
+      - label: "平台"
+        name: platform
+        widget: select
+        options: ["YouTube", "B站", "抖音", "Vimeo", "其他"]
+      - { label: "视频链接", name: url, widget: string, hint: "粘贴视频完整链接即可" }
+      - { label: "发布日期", name: pubDate, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "英文简介（可选）", name: description, widget: string, required: false }
+      - { label: "中文简介（可选）", name: descriptionZh, widget: string, required: false }

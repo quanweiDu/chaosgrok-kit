@@ -1,0 +1,104 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const trackEntries = await getCollection('tracks');
+const tracks = trackEntries
+  .sort((a, b) => a.data.num.localeCompare(b.data.num))
+  .map((t, i) => ({
+    num: t.data.num,
+    name: t.data.name,
+    src: `/music/${t.data.file}`,
+    index: i,
+  }));
+---
+
+<Layout title="Music" description="一些安静的旋律，伴随阅读或思考。">
+
+  <div class="list-hero fade-1">
+    <h1>Music.<br><em>音乐。</em></h1>
+    <p>一些安静的旋律，伴随阅读或思考。</p>
+  </div>
+
+  <div class="container fade-2">
+    <div class="track-list">
+      {tracks.map((t, i) => (
+        <div class="track-item" data-track-index={i} role="button" tabindex="0">
+          <div class="track-info">
+            <span class="track-num">{t.num}</span>
+            <span class="track-name">{t.name}</span>
+          </div>
+          <span class="track-play-hint">点击播放 ▶</span>
+        </div>
+      ))}
+    </div>
+    <p class="music-note">音乐会在底部播放器持续播放，切换页面不会中断。</p>
+  </div>
+
+</Layout>
+
+<style>
+  .track-list { padding: 0 0 48px; }
+
+  .track-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule-light);
+    cursor: pointer;
+    transition: padding-left 0.3s ease;
+    user-select: none;
+  }
+
+  .track-item:hover {
+    padding-left: 10px;
+  }
+
+  .track-item:hover .track-play-hint {
+    opacity: 1;
+  }
+
+  .track-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .track-num {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    font-style: italic;
+    color: var(--ink-ghost);
+    letter-spacing: 0.08em;
+    min-width: 24px;
+  }
+
+  .track-name {
+    font-family: var(--serif-en);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  .track-play-hint {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-ghost);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .music-note {
+    font-family: var(--serif-zh);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--ink-ghost);
+    margin-top: 32px;
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .track-play-hint { opacity: 1; }
+  }
+</style>

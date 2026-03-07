@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const books = await getCollection('books');
+---
+
+<Layout title="Books" description="电子书。每一本都是经过长时间沉淀的思考结晶。">
+
+  <div class="list-hero fade-1">
+    <h1>Books.<br><em>书籍。</em></h1>
+    <p>每一本都是经过长时间沉淀的思考结晶。</p>
+  </div>
+
+  <section class="books-section fade-2">
+    <div class="container">
+      {books.length === 0 ? (
+        <div class="empty-state">
+          <p>The first book is being written.</p>
+          <p class="empty-state-zh">第一本书正在写作中。</p>
+        </div>
+      ) : (
+        <div class="book-grid">
+          {books.map(b => (
+            <a href={`/books/${b.slug}`} class="book-card">
+              <span class="book-tag">Electronic Book · 电子书</span>
+
+              {/* 有封面图就显示图片，没有就显示首字母 */}
+              {b.data.cover ? (
+                <img src={b.data.cover} alt={b.data.title} class="book-cover-img" />
+              ) : (
+                <div class="cover-placeholder">
+                  <span>{b.data.title.charAt(0)}</span>
+                </div>
+              )}
+
+              <div class="book-title-en">{b.data.title}</div>
+              {b.data.titleZh && <div class="book-title-zh">{b.data.titleZh}</div>}
+              <p class="book-desc">{b.data.descriptionZh ?? b.data.description}</p>
+              <div class="book-footer">
+                <span class="book-price-tag">{b.data.price}</span>
+                <span class="book-arrow">→</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+</Layout>
+
+<style>
+  .book-cover-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .cover-placeholder {
+    width: 100%;
+    height: 200px;
+    background: var(--off-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif-en);
+    font-size: 56px;
+    font-weight: 400;
+    color: var(--ink-ghost);
+  }
+</style>

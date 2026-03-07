@@ -1,0 +1,204 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allLinks = await getCollection('links');
+
+// 按分类分组
+const categories = ['设计', '工具', '阅读', '思考', '其他'];
+
+const grouped = categories.reduce((acc, cat) => {
+  const items = allLinks.filter(l => l.data.category === cat);
+  if (items.length > 0) acc[cat] = items;
+  return acc;
+}, {} as Record<string, typeof allLinks>);
+---
+
+<Layout title="Links" description="导航收藏。自用工具与推荐资源。">
+
+  <div class="list-hero fade-1">
+    <h1>Links.<br><em>导航。</em></h1>
+    <p>自用收藏与推荐资源，持续更新。</p>
+  </div>
+
+  <div class="container fade-2">
+
+    <!-- 分类筛选标签 -->
+    <div class="cat-tabs">
+      <button class="cat-tab active" data-cat="all">全部</button>
+      {Object.keys(grouped).map(cat => (
+        <button class="cat-tab" data-cat={cat}>{cat}</button>
+      ))}
+    </div>
+
+    <!-- 链接列表 -->
+    <div class="links-body">
+      {Object.entries(grouped).map(([cat, items]) => (
+        <section class="link-section" data-section={cat}>
+          <div class="section-label"><span>{cat}</span></div>
+          <ul class="link-list">
+            {items.map(link => (
+              <li class="link-item" data-personal={link.data.personal}>
+                <a href={link.data.url} target="_blank" rel="noopener" class="link-row">
+                  <span class="link-title">{link.data.title}</span>
+                  {link.data.description && (
+                    <span class="link-desc">{link.data.description}</span>
+                  )}
+                  <span class="link-badge">
+                    {link.data.personal ? '自用' : '推荐'}
+                  </span>
+                  <span class="link-arrow">↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+  </div>
+
+</Layout>
+
+<style>
+  /* 分类标签栏 */
+  .cat-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 56px;
+    flex-wrap: wrap;
+  }
+
+  .cat-tab {
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 7px 18px;
+    font-family: var(--serif-zh);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.04em;
+  }
+
+  .cat-tab:hover {
+    border-color: var(--ink-ghost);
+    color: var(--ink);
+  }
+
+  .cat-tab.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+  }
+
+  /* 链接列表 */
+  .links-body { padding-bottom: 80px; }
+
+  .link-section { margin-bottom: 56px; }
+
+  .link-list { list-style: none; }
+
+  .link-item { border-top: 1px solid var(--rule-light); }
+  .link-item:last-child { border-bottom: 1px solid var(--rule-light); }
+
+  .link-row {
+    display: grid;
+    grid-template-columns: 200px 1fr auto auto;
+    align-items: center;
+    gap: 24px;
+    padding: 18px 0;
+    text-decoration: none;
+    color: inherit;
+    transition: padding-left 0.3s ease;
+  }
+
+  .link-row:hover { padding-left: 10px; }
+
+  .link-title {
+    font-family: var(--serif-en);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .link-desc {
+    font-family: var(--serif-zh);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--ink-light);
+    line-height: 1.6;
+  }
+
+  .link-badge {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-ghost);
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-family: var(--serif-en);
+  }
+
+  .link-arrow {
+    font-size: 14px;
+    color: var(--ink-ghost);
+    transition: all 0.2s ease;
+  }
+
+  .link-row:hover .link-arrow {
+    color: var(--ink);
+    transform: translate(2px, -2px);
+  }
+
+  /* 隐藏状态 */
+  .link-section.hidden { display: none; }
+
+  @media (max-width: 768px) {
+    .link-row {
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      gap: 6px 12px;
+    }
+    .link-title { font-size: 15px; }
+    .link-desc {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .link-badge { display: none; }
+    .link-arrow { grid-row: 1; }
+  }
+</style>
+
+<script>
+  function initTabs() {
+    const tabs = document.querySelectorAll('.cat-tab');
+    const sections = document.querySelectorAll('.link-section');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const cat = (tab as HTMLElement).dataset.cat;
+
+        // 更新激活状态
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // 显示/隐藏分类
+        sections.forEach(section => {
+          const s = section as HTMLElement;
+          if (cat === 'all' || s.dataset.section === cat) {
+            s.classList.remove('hidden');
+          } else {
+            s.classList.add('hidden');
+          }
+        });
+      });
+    });
+  }
+
+  initTabs();
+  document.addEventListener('astro:page-load', initTabs);
+</script>

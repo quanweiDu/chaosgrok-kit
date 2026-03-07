@@ -1,0 +1,47 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BackBtn from '../../components/BackBtn.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const books = await getCollection('books');
+  return books.map(book => ({
+    params: { slug: book.slug },
+    props: { book },
+  }));
+}
+
+const { book } = Astro.props;
+const { Content } = await book.render();
+---
+
+<Layout
+  title={book.data.title}
+  description={book.data.description}
+>
+
+  <div class="book-detail-page fade-1">
+
+    <div class="article-meta-top">
+      <BackBtn text="Books" href="/books" />
+    </div>
+
+    <h1 class="book-detail-h1">{book.data.title}</h1>
+    {book.data.titleZh && (
+      <p class="book-detail-subtitle">{book.data.titleZh}</p>
+    )}
+
+    <div class="book-detail-body">
+      <Content />
+    </div>
+
+    <div class="book-buy-block">
+      <span class="book-price-big">{book.data.price}</span>
+      <a href={book.data.buyLink} target="_blank" rel="noopener" class="btn-buy">
+        Buy Now
+      </a>
+    </div>
+
+  </div>
+
+</Layout>

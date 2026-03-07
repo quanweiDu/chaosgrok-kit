@@ -1,0 +1,44 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Layout title="Writing" description="所有文章。关于代码、逻辑与存在本身。">
+
+  <div class="list-hero fade-1">
+    <h1>Writing.<br><em>文字。</em></h1>
+    <p>记录思考的轨迹，不追求速度，只追求真实。</p>
+  </div>
+
+  <section class="writings">
+    <div class="container">
+      {posts.length === 0 ? (
+        <div class="empty-state">
+          <p>The first words are being written.</p>
+          <p class="empty-state-zh">第一篇文章即将到来。</p>
+        </div>
+      ) : (
+        <ul class="post-list">
+          {posts.map((p, i) => (
+            <li class="post-item">
+              <a href={`/blog/${p.slug}`} class="post-link">
+                <span class="post-num">No. {String(posts.length - i).padStart(3, '0')}</span>
+                <span class="post-title-wrap">
+                  <span class="post-title">{p.data.title}</span>
+                  {p.data.titleZh && (
+                    <span class="post-title-zh">{p.data.titleZh}</span>
+                  )}
+                </span>
+                <span class="post-date">{p.data.pubDate.toISOString().slice(0,10).replace(/-/g, '.')}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+
+</Layout>

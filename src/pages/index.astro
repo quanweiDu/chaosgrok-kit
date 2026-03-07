@@ -1,0 +1,211 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+
+const books = await getCollection('books');
+---
+
+<Layout title="Home">
+
+  <!-- Hero -->
+  <div class="hero fade-1">
+    <p class="hero-label">Personal Site · 个人站点</p>
+    <h1>Thinking out loud,<br><em>in writing.</em></h1>
+    <p class="hero-sub">记录思考的轨迹。关于代码、逻辑与存在本身。</p>
+    <div class="hero-rule"></div>
+    <button class="hero-play-btn" data-track-index="0" title="播放背景音乐">
+      <span class="hero-play-icon">▶</span>
+      <span class="hero-play-text">Calm Ambient</span>
+    </button>
+  </div>
+
+  <!-- 文章列表 -->
+  <section class="writings fade-2">
+    <div class="container">
+      <div class="section-label"><span>Latest Writing</span></div>
+
+      {posts.length === 0 ? (
+        <div class="empty-state">
+          <p>The first words are being written.</p>
+          <p class="empty-state-zh">第一篇文章即将到来。</p>
+        </div>
+      ) : (
+        <ul class="post-list">
+          {posts.map((p, i) => (
+            <li class="post-item">
+              <a href={`/blog/${p.slug}`} class="post-link">
+                <span class="post-num">No. {String(posts.length - i).padStart(3, '0')}</span>
+                <span class="post-title-wrap">
+                  <span class="post-title">{p.data.title}</span>
+                  {p.data.titleZh && (
+                    <span class="post-title-zh">{p.data.titleZh}</span>
+                  )}
+                </span>
+                <span class="post-date">{p.data.pubDate.toISOString().slice(0, 10).replace(/-/g, '.')}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <!-- 书籍 -->
+  {books.length > 0 && (
+    <section class="books-section fade-3">
+      <div class="container">
+        <div class="section-label"><span>Books · 书籍</span></div>
+        <div class="book-grid">
+          {books.map(b => (
+            <a href={`/books/${b.slug}`} class="book-card">
+              <span class="book-tag">Electronic Book · 电子书</span>
+              <div class="book-title-en">{b.data.title}</div>
+              {b.data.titleZh && <div class="book-title-zh">{b.data.titleZh}</div>}
+              <p class="book-desc">{b.data.descriptionZh ?? b.data.description}</p>
+              <div class="book-footer">
+                <span class="book-price-tag">{b.data.price}</span>
+                <span class="book-arrow">→</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- 咨询入口 -->
+  <div class="container fade-4">
+    <section class="consult-strip">
+      <div class="consult-inner">
+        <div class="consult-left">
+          <p class="consult-label">Consulting · 咨询</p>
+          <h2>Clarity is<br><em>a strategy.</em></h2>
+        </div>
+        <div class="consult-right">
+          <p>思路混乱？处于转折点？需要一个能深度对话的人？</p>
+          <p>一对一咨询，从问题到行动。</p>
+          <a href="/consult" class="consult-btn">了解咨询服务 →</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- About 条带 -->
+  <div class="container fade-4">
+    <section class="about-strip">
+      <div class="about-inner">
+        <div class="about-left">
+          <h2>A mind that prefers<br><em>clarity over noise.</em></h2>
+        </div>
+        <div class="about-right">
+          <p>我关注的是那些经得起时间检验的事物——逻辑的结构、语言的精确、系统的优雅。</p>
+          <p>这个站点是我思考的容器。没有算法，没有推送，只有文字和你。</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</Layout>
+
+<style>
+  .hero-play-btn {
+    margin-top: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: var(--ink-ghost);
+    transition: color 0.2s;
+  }
+
+  .hero-play-btn:hover { color: var(--ink); }
+
+  .hero-play-icon {
+    font-size: 11px;
+    border: 1px solid currentColor;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    padding-left: 2px;
+  }
+
+  .hero-play-text {
+    font-family: var(--serif-en);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    font-style: italic;
+  }
+
+  /* 咨询入口 */
+  .consult-strip {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 64px 0;
+    margin: 80px 0;
+  }
+
+  .consult-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .consult-label {
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-bottom: 20px;
+  }
+
+  .consult-strip h2 {
+    font-family: var(--serif-en);
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .consult-strip h2 em {
+    font-style: italic;
+    color: var(--ink-light);
+  }
+
+  .consult-right p {
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 2;
+    margin-bottom: 8px;
+  }
+
+  .consult-btn {
+    display: inline-block;
+    margin-top: 24px;
+    font-family: var(--serif-en);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: border-color 0.2s;
+  }
+
+  .consult-btn:hover { border-color: var(--ink); }
+
+  @media (max-width: 768px) {
+    .consult-inner { grid-template-columns: 1fr; gap: 32px; }
+  }
+</style>

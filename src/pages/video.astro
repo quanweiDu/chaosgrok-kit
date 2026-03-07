@@ -1,0 +1,266 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allVideos = await getCollection('videos');
+const videos = allVideos.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// 从各平台 URL 提取嵌入链接
+function getEmbedUrl(url: string, platform: string): string | null {
+  try {
+    // YouTube
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+
+    // B站
+    const biliMatch = url.match(/bilibili\.com\/video\/(BV[^\/\?]+|av\d+)/i);
+    if (biliMatch) return `https://player.bilibili.com/player.html?bvid=${biliMatch[1]}&high_quality=1&danmaku=0`;
+
+    // Vimeo
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+
+    // 抖音暂不支持嵌入，返回 null
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+const platforms = ['全部', 'YouTube', 'B站', '抖音', 'Vimeo', '其他'];
+---
+
+<Layout title="Video" description="视频内容。记录、分享、表达。">
+
+  <div class="list-hero fade-1">
+    <h1>Video.<br><em>视频。</em></h1>
+    <p>记录、分享、表达。不被平台限制。</p>
+  </div>
+
+  <div class="container fade-2">
+
+    <!-- 平台筛选 -->
+    <div class="platform-tabs">
+      {platforms.map(p => (
+        <button class={`platform-tab ${p === '全部' ? 'active' : ''}`} data-platform={p}>
+          {p}
+        </button>
+      ))}
+    </div>
+
+    {videos.length === 0 ? (
+      <div class="empty-state">
+        <p>First video coming soon.</p>
+        <p class="empty-state-zh">第一个视频即将到来。</p>
+      </div>
+    ) : (
+      <div class="video-grid">
+        {videos.map(v => {
+          const embedUrl = getEmbedUrl(v.data.url, v.data.platform);
+          const dateStr = v.data.pubDate.toISOString().slice(0, 10).replace(/-/g, '.');
+          return (
+            <div class="video-card" data-platform={v.data.platform}>
+              <div class="video-embed">
+                {embedUrl ? (
+                  <iframe
+                    src={embedUrl}
+                    allowfullscreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    loading="lazy"
+                  ></iframe>
+                ) : (
+                  <a href={v.data.url} target="_blank" rel="noopener" class="video-link-fallback">
+                    <span class="video-link-icon">▶</span>
+                    <span>在 {v.data.platform} 观看</span>
+                  </a>
+                )}
+              </div>
+              <div class="video-info">
+                <div class="video-meta">
+                  <span class="video-platform">{v.data.platform}</span>
+                  <span class="video-date">{dateStr}</span>
+                </div>
+                <h2 class="video-title">{v.data.title}</h2>
+                {v.data.titleZh && <p class="video-title-zh">{v.data.titleZh}</p>}
+                {(v.data.descriptionZh || v.data.description) && (
+                  <p class="video-desc">{v.data.descriptionZh ?? v.data.description}</p>
+                )}
+                <a href={v.data.url} target="_blank" rel="noopener" class="video-original">
+                  在 {v.data.platform} 观看原版 ↗
+                </a>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    )}
+
+  </div>
+
+</Layout>
+
+<style>
+  /* 平台标签 */
+  .platform-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 56px;
+    flex-wrap: wrap;
+  }
+
+  .platform-tab {
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 7px 18px;
+    font-family: var(--serif-en);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .platform-tab:hover { border-color: var(--ink-ghost); color: var(--ink); }
+  .platform-tab.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+
+  /* 视频网格 */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 64px 48px;
+    padding-bottom: 80px;
+  }
+
+  .video-card.hidden { display: none; }
+
+  /* 嵌入播放器 */
+  .video-embed {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: var(--off-white);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .video-embed iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  /* 不支持嵌入的平台（抖音等）*/
+  .video-link-fallback {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink-light);
+    font-family: var(--serif-en);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    border: 1px solid var(--rule);
+    transition: all 0.2s;
+  }
+
+  .video-link-fallback:hover { color: var(--ink); border-color: var(--ink-ghost); }
+
+  .video-link-icon {
+    font-size: 24px;
+    opacity: 0.3;
+  }
+
+  /* 视频信息 */
+  .video-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  .video-platform {
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    border: 1px solid var(--rule);
+    padding: 3px 10px;
+  }
+
+  .video-date {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    color: var(--ink-ghost);
+    font-style: italic;
+  }
+
+  .video-title {
+    font-family: var(--serif-en);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .video-title-zh {
+    font-size: 13px;
+    color: var(--ink-light);
+    margin-bottom: 12px;
+  }
+
+  .video-desc {
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  .video-original {
+    font-family: var(--serif-en);
+    font-size: 12px;
+    color: var(--ink-ghost);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  .video-original:hover { color: var(--ink); }
+
+  @media (max-width: 768px) {
+    .video-grid { grid-template-columns: 1fr; gap: 48px; }
+  }
+</style>
+
+<script>
+  function initTabs() {
+    const tabs = document.querySelectorAll('.platform-tab');
+    const cards = document.querySelectorAll('.video-card');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const p = (tab as HTMLElement).dataset.platform;
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        cards.forEach(card => {
+          const c = card as HTMLElement;
+          if (p === '全部' || c.dataset.platform === p) {
+            c.classList.remove('hidden');
+          } else {
+            c.classList.add('hidden');
+          }
+        });
+      });
+    });
+  }
+
+  initTabs();
+  document.addEventListener('astro:page-load', initTabs);
+</script>
