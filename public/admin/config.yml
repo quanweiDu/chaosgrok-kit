@@ -1,7 +1,7 @@
 backend:
   name: github
   repo: quanweiDu/chaosgrok
-  branch: main
+  branch: master
 
 media_folder: public/images
 public_folder: /images
