@@ -2,6 +2,7 @@ backend:
   name: github
   repo: quanweiDu/chaosgrok
   branch: master
+  base_url: https://sveltia-cms-auth.pages.dev
 
 media_folder: public/images
 public_folder: /images
