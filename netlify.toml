@@ -1,6 +1,16 @@
 [build]
-  command = "npm ci && npx astro build"
+  command = "npm install && ./node_modules/.bin/astro build"
   publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[redirects]]
   from = "/admin/*"
