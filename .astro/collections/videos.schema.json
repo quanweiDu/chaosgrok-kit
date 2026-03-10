@@ -17,12 +17,16 @@
             "B站",
             "抖音",
             "Vimeo",
+            "自制",
             "其他"
           ]
         },
         "url": {
           "type": "string",
           "format": "uri"
+        },
+        "file": {
+          "type": "string"
         },
         "description": {
           "type": "string"
