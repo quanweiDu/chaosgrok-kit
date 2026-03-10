@@ -4,55 +4,40 @@ import { getCollection } from 'astro:content';
 
 const allLinks = await getCollection('links');
 
-// 按分类分组
-const categories = ['设计', '工具', '阅读', '思考', '其他'];
+const categories = ['设计', '开发', '阅读', '思考', '工具', '音乐', '影像', '商业', '写作'];
 
 const grouped = categories.reduce((acc, cat) => {
-  const items = allLinks.filter(l => l.data.category === cat);
-  if (items.length > 0) acc[cat] = items;
+  acc[cat] = allLinks.filter(l => l.data.category === cat);
   return acc;
 }, {} as Record<string, typeof allLinks>);
 ---
 
-<Layout title="Links" description="导航收藏。自用工具与推荐资源。">
+<Layout title="Links — MR.QuanweiDU" description="值得一读的链接，按类别整理。">
 
-  <div class="list-hero fade-1">
-    <h1>Links.<br><em>导航。</em></h1>
-    <p>自用收藏与推荐资源，持续更新。</p>
-  </div>
+  <div class="links-page fade-1">
 
-  <div class="container fade-2">
-
-    <!-- 分类筛选标签 -->
-    <div class="cat-tabs">
-      <button class="cat-tab active" data-cat="all">全部</button>
-      {Object.keys(grouped).map(cat => (
-        <button class="cat-tab" data-cat={cat}>{cat}</button>
-      ))}
+    <div class="links-hero">
+      <h1 class="links-title">Links.</h1>
+      <p class="links-sub">值得一读的地方。</p>
     </div>
 
-    <!-- 链接列表 -->
-    <div class="links-body">
-      {Object.entries(grouped).map(([cat, items]) => (
-        <section class="link-section" data-section={cat}>
-          <div class="section-label"><span>{cat}</span></div>
-          <ul class="link-list">
-            {items.map(link => (
-              <li class="link-item" data-personal={link.data.personal}>
-                <a href={link.data.url} target="_blank" rel="noopener" class="link-row">
-                  <span class="link-title">{link.data.title}</span>
+    <div class="links-grid">
+      {categories.map(cat => grouped[cat]?.length > 0 && (
+        <div class="link-group">
+          <h2 class="group-title">{cat}</h2>
+          <ul class="group-list">
+            {grouped[cat].map(link => (
+              <li class="link-item">
+                <a href={link.data.url} target="_blank" rel="noopener" class="link-anchor">
+                  <span class="link-name">{link.data.title}</span>
                   {link.data.description && (
                     <span class="link-desc">{link.data.description}</span>
                   )}
-                  <span class="link-badge">
-                    {link.data.personal ? '自用' : '推荐'}
-                  </span>
-                  <span class="link-arrow">↗</span>
                 </a>
               </li>
             ))}
           </ul>
-        </section>
+        </div>
       ))}
     </div>
 
@@ -61,144 +46,94 @@ const grouped = categories.reduce((acc, cat) => {
 </Layout>
 
 <style>
-  /* 分类标签栏 */
-  .cat-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 56px;
-    flex-wrap: wrap;
+  .links-page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 140px 40px 100px;
   }
 
-  .cat-tab {
-    background: none;
-    border: 1px solid var(--rule);
-    padding: 7px 18px;
-    font-family: var(--serif-zh);
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--ink-light);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    letter-spacing: 0.04em;
+  .links-hero {
+    margin-bottom: 80px;
   }
 
-  .cat-tab:hover {
-    border-color: var(--ink-ghost);
-    color: var(--ink);
-  }
-
-  .cat-tab.active {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: var(--white);
-  }
-
-  /* 链接列表 */
-  .links-body { padding-bottom: 80px; }
-
-  .link-section { margin-bottom: 56px; }
-
-  .link-list { list-style: none; }
-
-  .link-item { border-top: 1px solid var(--rule-light); }
-  .link-item:last-child { border-bottom: 1px solid var(--rule-light); }
-
-  .link-row {
-    display: grid;
-    grid-template-columns: 200px 1fr auto auto;
-    align-items: center;
-    gap: 24px;
-    padding: 18px 0;
-    text-decoration: none;
-    color: inherit;
-    transition: padding-left 0.3s ease;
-  }
-
-  .link-row:hover { padding-left: 10px; }
-
-  .link-title {
+  .links-title {
     font-family: var(--serif-en);
-    font-size: 16px;
+    font-size: clamp(40px, 6vw, 72px);
     font-weight: 400;
     color: var(--ink);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+  }
+
+  .links-sub {
+    font-family: var(--serif-zh);
+    font-size: 15px;
+    color: var(--ink-ghost);
+    margin: 0;
+  }
+
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 56px 48px;
+  }
+
+  .group-title {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin: 0 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .group-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .link-anchor {
+    display: block;
+    padding: 8px 0;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+
+  .link-anchor:hover {
+    border-bottom-color: var(--rule);
+  }
+
+  .link-name {
+    display: block;
+    font-family: var(--serif-en);
+    font-size: 14px;
+    color: var(--ink);
+    transition: color 0.15s;
   }
 
   .link-desc {
+    display: block;
     font-family: var(--serif-zh);
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--ink-light);
-    line-height: 1.6;
-  }
-
-  .link-badge {
-    font-size: 10px;
-    letter-spacing: 0.12em;
+    font-size: 12px;
     color: var(--ink-ghost);
-    white-space: nowrap;
-    text-transform: uppercase;
-    font-family: var(--serif-en);
+    margin-top: 2px;
+    line-height: 1.5;
   }
-
-  .link-arrow {
-    font-size: 14px;
-    color: var(--ink-ghost);
-    transition: all 0.2s ease;
-  }
-
-  .link-row:hover .link-arrow {
-    color: var(--ink);
-    transform: translate(2px, -2px);
-  }
-
-  /* 隐藏状态 */
-  .link-section.hidden { display: none; }
 
   @media (max-width: 768px) {
-    .link-row {
-      grid-template-columns: 1fr auto;
-      grid-template-rows: auto auto;
-      gap: 6px 12px;
-    }
-    .link-title { font-size: 15px; }
-    .link-desc {
-      grid-column: 1;
-      grid-row: 2;
-    }
-    .link-badge { display: none; }
-    .link-arrow { grid-row: 1; }
+    .links-page { padding: 100px 20px 80px; }
+    .links-hero { margin-bottom: 48px; }
+    .links-grid { grid-template-columns: 1fr 1fr; gap: 40px 24px; }
+  }
+
+  @media (max-width: 480px) {
+    .links-grid { grid-template-columns: 1fr; gap: 36px; }
   }
 </style>
-
-<script>
-  function initTabs() {
-    const tabs = document.querySelectorAll('.cat-tab');
-    const sections = document.querySelectorAll('.link-section');
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const cat = (tab as HTMLElement).dataset.cat;
-
-        // 更新激活状态
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // 显示/隐藏分类
-        sections.forEach(section => {
-          const s = section as HTMLElement;
-          if (cat === 'all' || s.dataset.section === cat) {
-            s.classList.remove('hidden');
-          } else {
-            s.classList.add('hidden');
-          }
-        });
-      });
-    });
-  }
-
-  initTabs();
-  document.addEventListener('astro:page-load', initTabs);
-</script>

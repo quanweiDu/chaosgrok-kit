@@ -1,7 +1,7 @@
 ---
-title: "Butterick's Practical Typography"
+title: "Practical Typography"
 url: "https://practicaltypography.com"
-description: "最好的排版入门读物，免费在线阅读"
-category: "阅读"
+category: "设计"
+description: "最好的排版实践指南"
 personal: "false"
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Figma"
-url: "https://figma.com"
-description: "设计工具，协作友好，免费版够用"
+url: "https://www.figma.com"
 category: "设计"
+description: "设计工具"
 personal: "false"
 ---

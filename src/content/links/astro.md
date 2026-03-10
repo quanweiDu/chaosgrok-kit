@@ -1,7 +1,7 @@
 ---
 title: "Astro"
 url: "https://astro.build"
-description: "极快的静态网站框架，这个网站用它构建"
-category: "工具"
+category: "开发"
+description: "本站所用框架，内容驱动"
 personal: "false"
 ---

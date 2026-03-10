@@ -28,8 +28,8 @@ const links = defineCollection({
     title: z.string(),
     url: z.string().url(),
     description: z.string().optional(),
-    category: z.enum(['设计', '工具', '阅读', '思考', '其他']),
-   personal: z.string().default("false"), // true = 自用收藏，false = 推荐给读者
+    category: z.enum(['设计', '开发', '阅读', '思考', '工具', '音乐', '影像', '商业', '写作']),
+    personal: z.string().default("false"),
   }),
 });
 
