@@ -1,7 +1,13 @@
-/* ============================================================
-   字体加载 — 优先 Google Fonts，降级到本地衬线字体
-   ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+SC:wght@300;400&display=swap&font-display=swap');
+/* 字体由 Layout.astro <head> 中的 <link> 加载，不在此处 @import */
+
+/* 降级字体尺寸微调 — 减少字体加载后的布局偏移 */
+@font-face {
+  font-family: 'EB Garamond';
+  src: local('Georgia');
+  font-weight: 400;
+  size-adjust: 105%;
+  ascent-override: 90%;
+}
 /* ============================================================
    CSS 变量
    ============================================================ */
