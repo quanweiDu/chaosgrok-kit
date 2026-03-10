@@ -24,7 +24,9 @@ const dateStr = post.data.pubDate.toISOString().slice(0, 10).replace(/-/g, '.');
 >
   <ReadingProgress />
 
-  <div class="article-page fade-1">
+  <article class="article-page fade-1" itemscope itemtype="https://schema.org/BlogPosting">
+    <meta itemprop="datePublished" content={post.data.pubDate.toISOString()} />
+    <meta itemprop="author" content="MR.QuanweiDU" />
 
     <div class="article-meta-top">
       <BackBtn text="Writing" href="/blog" />
@@ -32,12 +34,12 @@ const dateStr = post.data.pubDate.toISOString().slice(0, 10).replace(/-/g, '.');
       <span class="article-date-str">{dateStr}</span>
     </div>
 
-    <h1 class="article-h1">{post.data.title}</h1>
+    <h1 class="article-h1" itemprop="headline">{post.data.title}</h1>
     {post.data.titleZh && (
       <p class="article-h1-zh">{post.data.titleZh}</p>
     )}
 
-    <div class="article-body">
+    <div class="article-body" itemprop="articleBody">
       <Content />
     </div>
 
@@ -52,7 +54,7 @@ const dateStr = post.data.pubDate.toISOString().slice(0, 10).replace(/-/g, '.');
 
     <PostToolbar />
 
-  </div>
+  </article>
 
 </Layout>
 
