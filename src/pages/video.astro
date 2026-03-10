@@ -184,12 +184,9 @@ function getYoutubeThumbnail(url: string): string | null {
       trigger?.addEventListener('mousedown', toggleVtb);
       trigger?.addEventListener('touchstart', toggleVtb, { passive: false });
 
-      document.addEventListener('mousedown', (e) => {
+      document.addEventListener('click', (e) => {
         if (!trigger?.contains(e.target as Node)) dropdown?.classList.remove('open');
       });
-      document.addEventListener('touchstart', (e) => {
-        if (!trigger?.contains(e.target as Node)) dropdown?.classList.remove('open');
-      }, { passive: true });
 
       const copyBtn = item.querySelector('.copy-link') as HTMLButtonElement;
       copyBtn?.addEventListener('click', () => {
@@ -417,16 +414,15 @@ function getYoutubeThumbnail(url: string): string | null {
 
   .vtb-dropdown {
     position: absolute;
-    bottom: calc(100% + 12px);
+    bottom: calc(100% + 16px);
     right: 0;
-    background: var(--bg);
-    border-top: 1px solid var(--rule);
-    min-width: 160px;
+    background: none;
+    min-width: 140px;
     z-index: 100;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(4px);
-    transition: opacity 0.15s, transform 0.15s;
+    transform: translateY(6px);
+    transition: opacity 0.12s, transform 0.12s;
   }
 
   .vtb-dropdown.open {
@@ -436,19 +432,23 @@ function getYoutubeThumbnail(url: string): string | null {
   }
 
   .vtb-share-item {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     width: 100%;
-    padding: 11px 0;
+    min-height: 44px;
+    padding: 6px 0;
     border: none;
-    border-bottom: 1px solid var(--rule);
     background: none;
     cursor: pointer;
     font-family: var(--serif-en);
     font-size: 13px;
-    color: var(--ink-ghost);
+    color: var(--ink-light);
     text-decoration: none;
-    text-align: left;
-    transition: color 0.2s;
+    text-align: right;
+    transition: color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
   }
 
   .vtb-share-item:hover { color: var(--ink); }
