@@ -28,16 +28,12 @@ const platformColors: Record<string, string> = {
       {sorted.map((video) => {
         const isSelf = video.data.platform === '自制';
         const dateStr = video.data.pubDate.toISOString().slice(0, 7).replace('-', '.');
+        const slug = video.slug;
         return (
-          <div class={`video-item ${isSelf ? 'is-self' : 'is-external'}`}>
+          <div class="video-item" data-slug={slug}>
             {isSelf && video.data.file ? (
               <div class="video-player-wrap">
-                <video
-                  class="video-player"
-                  controls
-                  preload="none"
-                  poster=""
-                >
+                <video class="video-player" controls preload="metadata">
                   <source src={video.data.file} type="video/mp4" />
                 </video>
               </div>
@@ -50,9 +46,13 @@ const platformColors: Record<string, string> = {
                       <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/>
                     </svg>
                   </div>
+                  <span class="video-platform-badge" style={`background: ${platformColors[video.data.platform]}`}>
+                    {video.data.platform}
+                  </span>
                 </div>
               </a>
             )}
+
             <div class="video-meta">
               <div class="video-meta-top">
                 <span class="video-platform" style={`color: ${platformColors[video.data.platform]}`}>
@@ -67,13 +67,35 @@ const platformColors: Record<string, string> = {
                   <h2 class="video-name">{video.data.title}</h2>
                 </a>
               )}
-              {video.data.titleZh && (
-                <p class="video-name-zh">{video.data.titleZh}</p>
-              )}
-              {video.data.description && (
-                <p class="video-desc">{video.data.description}</p>
-              )}
+              {video.data.titleZh && <p class="video-name-zh">{video.data.titleZh}</p>}
+              {video.data.description && <p class="video-desc">{video.data.description}</p>}
             </div>
+
+            <!-- 每个视频独立工具栏 -->
+            <div class="video-toolbar">
+              <button class="vtb-btn like-btn" title="点赞">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16" class="like-icon"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                <span class="like-count">0</span>
+              </button>
+              <button class="vtb-btn bookmark-btn" title="收藏">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16" class="bookmark-icon"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+                <span class="bookmark-count">0</span>
+              </button>
+              <div class="vtb-space"></div>
+              <div class="vtb-share-wrap">
+                <button class="vtb-btn share-trigger" title="分享">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                  <span>分享</span>
+                </button>
+                <div class="vtb-dropdown">
+                  <button class="vtb-share-item copy-link">复制链接</button>
+                  <a class="vtb-share-item share-x" href="#" target="_blank" rel="noopener">分享到 X</a>
+                  <a class="vtb-share-item share-weibo" href="#" target="_blank" rel="noopener">分享到微博</a>
+                  <a class="vtb-share-item share-telegram" href="#" target="_blank" rel="noopener">分享到 Telegram</a>
+                </div>
+              </div>
+            </div>
+
           </div>
         );
       })}
@@ -83,6 +105,86 @@ const platformColors: Record<string, string> = {
 
 </Layout>
 
+<script>
+  function initVideoToolbars() {
+    document.querySelectorAll('.video-item').forEach(item => {
+      const slug = 'video:' + (item.getAttribute('data-slug') || Math.random());
+      const pageUrl = window.location.href.split('?')[0] + '#' + (item.getAttribute('data-slug') || '');
+      const title = item.querySelector('.video-name')?.textContent || document.title;
+
+      // 点赞
+      const likeBtn = item.querySelector('.like-btn') as HTMLButtonElement;
+      const likeIcon = item.querySelector('.like-icon') as SVGElement;
+      const likeCount = item.querySelector('.like-count') as HTMLElement;
+      let liked = localStorage.getItem('liked:' + slug) === '1';
+      let likes = parseInt(localStorage.getItem('likes:' + slug) || '0');
+
+      function updateLike() {
+        likeCount.textContent = String(likes);
+        likeIcon.setAttribute('fill', liked ? 'currentColor' : 'none');
+        likeBtn.classList.toggle('active-like', liked);
+      }
+      updateLike();
+      likeBtn?.addEventListener('click', () => {
+        liked = !liked;
+        likes = liked ? likes + 1 : Math.max(0, likes - 1);
+        localStorage.setItem('liked:' + slug, liked ? '1' : '0');
+        localStorage.setItem('likes:' + slug, String(likes));
+        updateLike();
+      });
+
+      // 收藏
+      const bookmarkBtn = item.querySelector('.bookmark-btn') as HTMLButtonElement;
+      const bookmarkIcon = item.querySelector('.bookmark-icon') as SVGElement;
+      const bookmarkCount = item.querySelector('.bookmark-count') as HTMLElement;
+      let bookmarked = localStorage.getItem('bookmarked:' + slug) === '1';
+      let bookmarks = parseInt(localStorage.getItem('bookmarks:' + slug) || '0');
+
+      function updateBookmark() {
+        bookmarkCount.textContent = String(bookmarks);
+        bookmarkIcon.setAttribute('fill', bookmarked ? 'currentColor' : 'none');
+        bookmarkBtn.classList.toggle('active-bookmark', bookmarked);
+      }
+      updateBookmark();
+      bookmarkBtn?.addEventListener('click', () => {
+        bookmarked = !bookmarked;
+        bookmarks = bookmarked ? bookmarks + 1 : Math.max(0, bookmarks - 1);
+        localStorage.setItem('bookmarked:' + slug, bookmarked ? '1' : '0');
+        localStorage.setItem('bookmarks:' + slug, String(bookmarks));
+        updateBookmark();
+      });
+
+      // 分享
+      const trigger = item.querySelector('.share-trigger') as HTMLButtonElement;
+      const dropdown = item.querySelector('.vtb-dropdown') as HTMLElement;
+      trigger?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown?.classList.toggle('open');
+      });
+      document.addEventListener('click', () => dropdown?.classList.remove('open'));
+
+      const copyBtn = item.querySelector('.copy-link') as HTMLButtonElement;
+      copyBtn?.addEventListener('click', () => {
+        navigator.clipboard.writeText(pageUrl).then(() => {
+          copyBtn.textContent = '已复制 ✓';
+          setTimeout(() => copyBtn.textContent = '复制链接', 2000);
+          dropdown?.classList.remove('open');
+        });
+      });
+
+      const shareX = item.querySelector('.share-x') as HTMLAnchorElement;
+      if (shareX) shareX.href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(title)}`;
+      const shareWeibo = item.querySelector('.share-weibo') as HTMLAnchorElement;
+      if (shareWeibo) shareWeibo.href = `https://service.weibo.com/share/share.php?url=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(title)}`;
+      const shareTelegram = item.querySelector('.share-telegram') as HTMLAnchorElement;
+      if (shareTelegram) shareTelegram.href = `https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(title)}`;
+    });
+  }
+
+  initVideoToolbars();
+  document.addEventListener('astro:page-load', initVideoToolbars);
+</script>
+
 <style>
   .video-page {
     max-width: 800px;
@@ -90,9 +192,7 @@ const platformColors: Record<string, string> = {
     padding: 140px 40px 100px;
   }
 
-  .video-hero {
-    margin-bottom: 80px;
-  }
+  .video-hero { margin-bottom: 80px; }
 
   .video-title {
     font-family: var(--serif-en);
@@ -113,16 +213,13 @@ const platformColors: Record<string, string> = {
   .video-list {
     display: flex;
     flex-direction: column;
-    gap: 72px;
+    gap: 80px;
   }
 
-  .video-item {}
-
-  /* 自制视频 — 全宽播放器 */
   .video-player-wrap {
     width: 100%;
     background: #0a0a0a;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .video-player {
@@ -132,11 +229,11 @@ const platformColors: Record<string, string> = {
     object-fit: contain;
   }
 
-  /* 外链视频 — 封面占位 */
   .video-external-link {
     display: block;
     text-decoration: none;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    position: relative;
   }
 
   .video-thumb-wrap {
@@ -148,27 +245,32 @@ const platformColors: Record<string, string> = {
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
+    position: relative;
   }
 
-  .video-external-link:hover .video-thumb-wrap {
-    background: #e8e7e4;
+  .video-external-link:hover .video-thumb-wrap { background: #e8e7e4; }
+
+  .video-thumb-placeholder { color: var(--ink-ghost); transition: color 0.2s; }
+  .video-external-link:hover .video-thumb-placeholder { color: var(--ink); }
+
+  .video-platform-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 2px;
   }
 
-  .video-thumb-placeholder {
-    color: var(--ink-ghost);
-    transition: color 0.2s;
-  }
-
-  .video-external-link:hover .video-thumb-placeholder {
-    color: var(--ink);
-  }
-
-  /* 元信息 */
   .video-meta-top {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .video-platform {
@@ -194,32 +296,100 @@ const platformColors: Record<string, string> = {
     letter-spacing: -0.01em;
   }
 
-  .video-name-link {
-    text-decoration: none;
-  }
-
-  .video-name-link:hover .video-name {
-    color: var(--ink-light);
-  }
+  .video-name-link { text-decoration: none; }
+  .video-name-link:hover .video-name { color: var(--ink-light); }
 
   .video-name-zh {
     font-family: var(--serif-zh);
     font-size: 13px;
     color: var(--ink-ghost);
-    margin: 0 0 10px;
+    margin: 0 0 8px;
   }
 
   .video-desc {
     font-family: var(--serif-zh);
     font-size: 14px;
     color: var(--ink-light);
-    margin: 10px 0 0;
+    margin: 8px 0 0;
     line-height: 1.8;
   }
+
+  /* 工具栏 */
+  .video-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .vtb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-ghost);
+    font-family: var(--serif-en);
+    font-size: 13px;
+    padding: 0;
+    transition: color 0.2s;
+  }
+
+  .vtb-btn:hover { color: var(--ink); }
+  .vtb-btn.active-like { color: #c0392b; }
+  .vtb-btn.active-like .like-icon { fill: currentColor; }
+  .vtb-btn.active-bookmark { color: var(--ink); }
+  .vtb-btn.active-bookmark .bookmark-icon { fill: currentColor; }
+
+  .vtb-space { flex: 1; }
+
+  .vtb-share-wrap { position: relative; }
+
+  .vtb-dropdown {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    right: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--rule);
+    min-width: 160px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .vtb-dropdown.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .vtb-share-item {
+    display: block;
+    width: 100%;
+    padding: 11px 0;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    background: none;
+    cursor: pointer;
+    font-family: var(--serif-en);
+    font-size: 13px;
+    color: var(--ink-ghost);
+    text-decoration: none;
+    text-align: left;
+    transition: color 0.2s;
+  }
+
+  .vtb-share-item:hover { color: var(--ink); }
+  .vtb-share-item:last-child { border-bottom: none; }
 
   @media (max-width: 768px) {
     .video-page { padding: 100px 20px 80px; }
     .video-hero { margin-bottom: 48px; }
-    .video-list { gap: 56px; }
+    .video-list { gap: 60px; }
   }
 </style>
