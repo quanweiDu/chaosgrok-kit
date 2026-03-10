@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Thank You" description="感谢你的支持。">
+
+  <div class="thankyou-wrap fade-1">
+
+    <div class="thankyou-inner">
+      <p class="thankyou-label">Thank You · 感谢</p>
+      <h1>收到了。<br><em>Thank you.</em></h1>
+      <p class="thankyou-sub">你的支持让这里得以继续存在。<br>Every purchase keeps this place alive.</p>
+
+      <div class="thankyou-rule"></div>
+
+      <div class="thankyou-actions">
+        <a href="/blog" class="thankyou-link">继续阅读 →</a>
+        <a href="/books" class="thankyou-link">浏览更多书籍 →</a>
+        <a href="/" class="thankyou-link">回到首页 →</a>
+      </div>
+    </div>
+
+  </div>
+
+</Layout>
+
+<style>
+  .thankyou-wrap {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+  }
+
+  .thankyou-inner {
+    max-width: 560px;
+    text-align: center;
+  }
+
+  .thankyou-label {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-bottom: 32px;
+  }
+
+  .thankyou-inner h1 {
+    font-family: var(--serif-en);
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  .thankyou-inner h1 em {
+    font-style: italic;
+    color: var(--ink-light);
+  }
+
+  .thankyou-sub {
+    font-size: 15px;
+    color: var(--ink-light);
+    line-height: 2;
+    margin-bottom: 48px;
+  }
+
+  .thankyou-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--rule);
+    margin: 0 auto 48px;
+  }
+
+  .thankyou-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .thankyou-link {
+    font-family: var(--serif-en);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    color: var(--ink-light);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+    transition: all 0.2s;
+  }
+
+  .thankyou-link:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+</style>

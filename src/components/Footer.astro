@@ -28,6 +28,17 @@ const socials = [
         ))}
       </div>
     </div>
+    <nav class="footer-nav">
+      <a href="/">Home</a>
+      <a href="/blog">Writing</a>
+      <a href="/books">Books</a>
+      <a href="/music">Music</a>
+      <a href="/video">Video</a>
+      <a href="/links">Links</a>
+      <a href="/about">About</a>
+      <a href="/consult">咨询</a>
+      <a href="/search">搜索</a>
+    </nav>
     <div class="footer-bottom">
       <span class="footer-copy">© {year} MR.QuanweiDU</span>
       <span class="footer-tagline">Thinking out loud, in writing.</span>
@@ -103,9 +114,27 @@ const socials = [
     color: var(--ink-ghost);
   }
 
+  .footer-nav {
+    display: none;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .footer-nav a {
+    font-family: var(--serif-en);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: var(--ink-ghost);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-nav a:hover { color: var(--ink); }
+
   @media (max-width: 768px) {
     .footer-inner { padding: 0 20px; }
     .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
     .footer-tagline { display: none; }
+    .footer-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; }
   }
 </style>

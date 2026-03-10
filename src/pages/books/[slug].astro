@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import BackBtn from '../../components/BackBtn.astro';
+import PostToolbar from '../../components/PostToolbar.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -43,5 +44,6 @@ const { Content } = await book.render();
     </div>
 
   </div>
+    <PostToolbar />
 
 </Layout>

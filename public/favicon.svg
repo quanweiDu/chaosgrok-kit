@@ -1,5 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#0f0f0f"/>
-  <text x="16" y="22" font-family="Georgia, serif" font-size="16" font-weight="400"
-        text-anchor="middle" fill="#ffffff" letter-spacing="-0.5">Y</text>
+  <text
+    x="16"
+    y="25"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="28"
+    font-weight="400"
+    fill="#0f0f0f"
+    text-anchor="middle"
+  >Q</text>
 </svg>

@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import BackBtn from '../../components/BackBtn.astro';
 import ReadingProgress from '../../components/ReadingProgress.astro';
+import PostToolbar from '../../components/PostToolbar.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -48,6 +49,8 @@ const dateStr = post.data.pubDate.toISOString().slice(0, 10).replace(/-/g, '.');
         </audio>
       </div>
     )}
+
+    <PostToolbar />
 
   </div>
 

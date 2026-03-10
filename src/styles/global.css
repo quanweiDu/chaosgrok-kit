@@ -8,6 +8,7 @@
 :root {
   --white:      #ffffff;
   --off-white:  #fafaf9;
+  --bg:         #ffffff;
   --ink:        #0f0f0f;
   --ink-light:  #6b6b6b;
   --ink-ghost:  #b8b8b4;
@@ -36,7 +37,7 @@ html {
   font-size: 17px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-y: scroll;
+  overflow-y: auto;
   scroll-behavior: smooth;
   text-rendering: optimizeLegibility;
 }
@@ -141,16 +142,14 @@ img { display: block; max-width: 100%; }
 .nav-links a:hover { color: var(--ink); }
 .nav-links a:hover::after { transform: scaleX(1); }
 
-.nav-consult {
-  border: 1px solid var(--rule) !important;
-  padding: 5px 14px !important;
-  color: var(--ink) !important;
+.nav-search {
+  display: flex !important;
+  align-items: center;
+  color: var(--ink-ghost) !important;
+  padding: 0 !important;
 }
-.nav-consult::after { display: none !important; }
-.nav-consult:hover {
-  background: var(--ink) !important;
-  color: var(--white) !important;
-}
+.nav-search::after { display: none !important; }
+.nav-search:hover { color: var(--ink) !important; }
 
 /* ============================================================
    容器
@@ -785,10 +784,12 @@ main { flex: 1; }
 @media (max-width: 768px) {
   html { font-size: 16px; }
 
-  .nav-inner { padding: 0 20px; height: 56px; }
+  /* 导航：只显示 logo 和搜索 */
+  .nav-inner { padding: 0 24px; height: 56px; }
   .nav-logo { font-size: 13px; }
-  .nav-links { gap: 20px; }
-  .nav-links a { font-size: 11px; }
+  .nav-links { gap: 0; }
+  .nav-links li { display: none; }
+  .nav-links li:last-child { display: flex; } /* 只保留搜索图标 */
 
   .hero { padding: 110px 20px 80px; }
   .container { padding: 0 20px; }
