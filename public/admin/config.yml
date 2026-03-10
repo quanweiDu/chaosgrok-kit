@@ -1,8 +1,6 @@
 backend:
-  name: github
-  repo: quanweiDu/chaosgrok
+  name: git-gateway
   branch: master
-  base_url: https://decap-proxy.netlify.app
 
 media_folder: public/images
 public_folder: /images
