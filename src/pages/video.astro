@@ -208,6 +208,20 @@ function getYoutubeThumbnail(url: string): string | null {
 
   initVideoToolbars();
   document.addEventListener('astro:page-load', initVideoToolbars);
+
+  // 同一时间只允许一个视频播放
+  function initVideoExclusion() {
+    document.querySelectorAll('video.video-player').forEach(video => {
+      video.addEventListener('play', () => {
+        document.querySelectorAll('video.video-player').forEach(other => {
+          if (other !== video) (other as HTMLVideoElement).pause();
+        });
+      });
+    });
+  }
+
+  initVideoExclusion();
+  document.addEventListener('astro:page-load', initVideoExclusion);
 </script>
 
 <style>
