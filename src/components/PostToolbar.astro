@@ -83,12 +83,21 @@
     const trigger = document.getElementById('share-trigger');
     const dropdown = document.getElementById('share-dropdown');
 
-    trigger?.addEventListener('click', (e) => {
+    function toggleDropdown(e: Event) {
+      e.preventDefault();
       e.stopPropagation();
       dropdown?.classList.toggle('open');
-    });
+    }
 
-    document.addEventListener('click', () => dropdown?.classList.remove('open'));
+    trigger?.addEventListener('mousedown', toggleDropdown);
+    trigger?.addEventListener('touchstart', toggleDropdown, { passive: false });
+
+    document.addEventListener('mousedown', (e) => {
+      if (!trigger?.contains(e.target as Node)) dropdown?.classList.remove('open');
+    });
+    document.addEventListener('touchstart', (e) => {
+      if (!trigger?.contains(e.target as Node)) dropdown?.classList.remove('open');
+    }, { passive: true });
 
     // 复制链接
     document.getElementById('copy-link')?.addEventListener('click', () => {
@@ -139,6 +148,7 @@
   }
 
   .toolbar-btn:hover { color: var(--ink); }
+  .toolbar-btn:active { transform: scale(0.92); }
   .toolbar-btn.active-like { color: #c0392b; }
   .toolbar-btn.active-like svg { fill: currentColor; }
   .toolbar-btn.active-bookmark { color: var(--ink); }

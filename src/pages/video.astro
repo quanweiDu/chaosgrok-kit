@@ -174,11 +174,22 @@ function getYoutubeThumbnail(url: string): string | null {
       // 分享
       const trigger = item.querySelector('.share-trigger') as HTMLButtonElement;
       const dropdown = item.querySelector('.vtb-dropdown') as HTMLElement;
-      trigger?.addEventListener('click', (e) => {
+
+      function toggleVtb(e: Event) {
+        e.preventDefault();
         e.stopPropagation();
         dropdown?.classList.toggle('open');
+      }
+
+      trigger?.addEventListener('mousedown', toggleVtb);
+      trigger?.addEventListener('touchstart', toggleVtb, { passive: false });
+
+      document.addEventListener('mousedown', (e) => {
+        if (!trigger?.contains(e.target as Node)) dropdown?.classList.remove('open');
       });
-      document.addEventListener('click', () => dropdown?.classList.remove('open'));
+      document.addEventListener('touchstart', (e) => {
+        if (!trigger?.contains(e.target as Node)) dropdown?.classList.remove('open');
+      }, { passive: true });
 
       const copyBtn = item.querySelector('.copy-link') as HTMLButtonElement;
       copyBtn?.addEventListener('click', () => {
@@ -394,6 +405,7 @@ function getYoutubeThumbnail(url: string): string | null {
   }
 
   .vtb-btn:hover { color: var(--ink); }
+  .vtb-btn:active { transform: scale(0.92); }
   .vtb-btn.active-like { color: #c0392b; }
   .vtb-btn.active-like .like-icon { fill: currentColor; }
   .vtb-btn.active-bookmark { color: var(--ink); }
