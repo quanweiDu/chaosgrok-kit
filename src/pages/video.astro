@@ -43,25 +43,29 @@ function getYoutubeThumbnail(url: string): string | null {
                 </video>
               </div>
             ) : (
-              <div class="video-thumb-wrap">
+              <div class="video-embed-wrap">
                 {video.data.platform === 'YouTube' && getYoutubeThumbnail(video.data.url) ? (
-                  <img
-                    src={getYoutubeThumbnail(video.data.url)!}
-                    alt={video.data.title}
-                    class="video-thumb-img"
+                  <iframe
+                    src={`https://www.youtube.com/embed/${video.data.url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]}`}
+                    title={video.data.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
                     loading="lazy"
-                  />
+                    class="video-iframe"
+                  ></iframe>
                 ) : (
-                  <div class="video-thumb-placeholder">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="32" height="32">
-                      <circle cx="12" cy="12" r="10"/>
-                      <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/>
-                    </svg>
-                  </div>
+                  <a href={video.data.url} target="_blank" rel="noopener" class="video-thumb-wrap">
+                    <div class="video-thumb-placeholder">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="32" height="32">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/>
+                      </svg>
+                    </div>
+                    <span class="video-platform-badge" style={`background: ${platformColors[video.data.platform]}`}>
+                      {video.data.platform}
+                    </span>
+                  </a>
                 )}
-                <span class="video-platform-badge" style={`background: ${platformColors[video.data.platform]}`}>
-                  {video.data.platform}
-                </span>
               </div>
             )}
 
@@ -249,22 +253,34 @@ function getYoutubeThumbnail(url: string): string | null {
     position: relative;
   }
 
+  .video-embed-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin-bottom: 20px;
+    background: #0a0a0a;
+  }
+
+  .video-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
   .video-thumb-wrap {
+    display: flex;
     width: 100%;
     aspect-ratio: 16 / 9;
     background: #f0efed;
     border: 1px solid var(--rule);
-    display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    text-decoration: none;
     position: relative;
+    transition: background 0.2s;
   }
 
-  .video-external-link:hover .video-thumb-wrap { background: #e8e7e4; }
-
-  .video-thumb-placeholder { color: var(--ink-ghost); transition: color 0.2s; }
-  .video-external-link:hover .video-thumb-placeholder { color: var(--ink); }
+  .video-thumb-wrap:hover { background: #e8e7e4; }
 
   .video-platform-badge {
     position: absolute;
