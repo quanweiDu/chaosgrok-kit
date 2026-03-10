@@ -45,8 +45,9 @@ const videos = defineCollection({
   schema: z.object({
     title: z.string(),
     titleZh: z.string().optional(),
-    platform: z.enum(['YouTube', 'B站', '抖音', 'Vimeo', '其他']),
+    platform: z.enum(['YouTube', 'B站', '抖音', 'Vimeo', '自制', '其他']),
     url: z.string().url(),
+    file: z.string().optional(), // 自制视频的本地文件路径
     description: z.string().optional(),
     descriptionZh: z.string().optional(),
     pubDate: z.date(),
