@@ -3,7 +3,8 @@ backend:
   repo: quanweiDu/chaosgrok
   branch: master
   site_domain: chaosgrok.pages.dev
-  base_url: https://decap-cms-github-proxy.vercel.app # 👈 關鍵就是這行，它是免費的公共認證代理
+  base_url: https://cms-auth.3690413.workers.dev # 👈 填你的 Worker 地址
+  
 media_folder: public/images
 public_folder: /images
 
