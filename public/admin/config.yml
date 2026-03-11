@@ -1,9 +1,9 @@
 backend:
   name: github
   repo: quanweiDu/chaosgrok
-  branch: master # 根據截圖，你的主分支是 master
-  site_domain: chaosgrok.pages.dev # 你的新家網址
-
+  branch: master
+  site_domain: chaosgrok.pages.dev
+  base_url: https://decap-cms-github-proxy.vercel.app # 👈 關鍵就是這行，它是免費的公共認證代理
 media_folder: public/images
 public_folder: /images
 
