@@ -1,6 +1,8 @@
 backend:
-  name: git-gateway
-  branch: master
+  name: github
+  repo: quanweiDu/chaosgrok
+  branch: master # 根據截圖，你的主分支是 master
+  site_domain: chaosgrok.pages.dev # 你的新家網址
 
 media_folder: public/images
 public_folder: /images
