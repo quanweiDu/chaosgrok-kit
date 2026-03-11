@@ -2,8 +2,8 @@ backend:
   name: github
   repo: quanweiDu/chaosgrok
   branch: master
-  site_domain: chaosgrok.pages.dev
-  base_url: https://cms-auth.3690413.workers.dev # 👈 填你的 Worker 地址
+  base_url: https://cms-auth.3690413.workers.dev  # ← 保持 Worker URL
+  auth_endpoint: auth  # 或 ''，看 Worker 代碼怎麼設（常見是 /auth 開啟 popup）👈 填你的 Worker 地址
   
 media_folder: public/images
 public_folder: /images
