@@ -1,0 +1,220 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blockchain');
+const sorted = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<Layout title="Blockchain — MR.QuanweiDU" description="关于区块链的思考与记录。">
+
+  <div class="topic-page fade-1">
+
+    <div class="topic-hero">
+      <p class="topic-label">Blockchain</p>
+      <h1 class="topic-title">Blockchain.</h1>
+      <p class="topic-sub">链上发生的，不会消失。</p>
+    </div>
+
+    {sorted.length === 0 ? (
+      <div class="empty-state">
+        <p>还没有内容，第一篇正在酝酿中。</p>
+      </div>
+    ) : (
+      <div class="post-list">
+        {sorted.map((post) => {
+          const dateStr = post.data.pubDate.toISOString().slice(0, 10);
+          return (
+            <article class="post-item reveal">
+              <div class="post-meta">
+                <span class="post-date">{dateStr}</span>
+                {post.data.chains && post.data.chains.length > 0 && (
+                  <div class="post-tags">
+                    {post.data.chains.map(m => <span class="tag">{m}</span>)}
+                  </div>
+                )}
+              </div>
+              <h2 class="post-title">{post.data.title}</h2>
+              {post.data.titleZh && <p class="post-title-zh">{post.data.titleZh}</p>}
+              {post.data.description && <p class="post-desc">{post.data.description}</p>}
+              {post.data.refs && post.data.refs.length > 0 && (
+                <div class="post-refs">
+                  <span class="refs-label">参考资料</span>
+                  {post.data.refs.map(ref => (
+                    <a href={ref} target="_blank" rel="noopener" class="ref-link">
+                      {new URL(ref).hostname} ↗
+                    </a>
+                  ))}
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    )}
+
+  </div>
+
+</Layout>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+<style>
+  .topic-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 140px 40px 120px;
+  }
+
+  .topic-hero { margin-bottom: 80px; }
+
+  .topic-label {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.1s forwards;
+  }
+
+  .topic-title {
+    font-family: var(--serif-en);
+    font-size: clamp(48px, 7vw, 80px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0 0 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.2s forwards;
+  }
+
+  .topic-sub {
+    font-family: var(--serif-zh);
+    font-size: 15px;
+    color: var(--ink-ghost);
+    margin: 0;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.3s forwards;
+  }
+
+  .empty-state {
+    font-family: var(--serif-zh);
+    font-size: 14px;
+    color: var(--ink-ghost);
+    padding: 60px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .post-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-item {
+    padding: 40px 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .post-item:last-child { border-bottom: 1px solid var(--rule); }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .post-date {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-ghost);
+  }
+
+  .post-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tag {
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    border: 1px solid var(--rule);
+    padding: 2px 8px;
+  }
+
+  .post-title {
+    font-family: var(--serif-en);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .post-title-zh {
+    font-family: var(--serif-zh);
+    font-size: 13px;
+    color: var(--ink-ghost);
+    margin: 0 0 12px;
+  }
+
+  .post-desc {
+    font-family: var(--serif-zh);
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 2;
+    margin: 12px 0 0;
+  }
+
+  .post-refs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .refs-label {
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+  }
+
+  .ref-link {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    color: var(--ink-ghost);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .ref-link:hover { color: var(--ink); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    .topic-page { padding: 100px 20px 80px; }
+  }
+</style>

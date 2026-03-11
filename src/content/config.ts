@@ -19,7 +19,7 @@ const books = defineCollection({
     buyLink: z.string().url(),
     description: z.string(),
     descriptionZh: z.string().optional(),
-    cover: z.string().optional(), // ← 封面图路径，可不填
+    cover: z.string().optional(),
   }),
 });
 
@@ -45,13 +45,47 @@ const videos = defineCollection({
   schema: z.object({
     title: z.string(),
     titleZh: z.string().optional(),
-    platform: z.enum(['YouTube', 'B站', '抖音', 'Vimeo', '自制', '其他']),
-    url: z.string().url(),
-    file: z.string().optional(), // 自制视频的本地文件路径
+    platform: z.enum(['YouTube', 'B站', '抖音', 'Vimeo', '自制', '其他']).optional(),
+    url: z.string().url().optional(),
+    file: z.string().optional(),
+    cover: z.string().optional(),
     description: z.string().optional(),
     descriptionZh: z.string().optional(),
     pubDate: z.date(),
   }),
 });
 
-export const collections = { blog, books, links, tracks, videos };
+const ai = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    titleZh: z.string().optional(),
+    pubDate: z.date(),
+    description: z.string().optional(),
+    models: z.array(z.string()).optional(),   // 模型/工具标签，如 ["GPT-4", "Claude"]
+    refs: z.array(z.string().url()).optional(), // 外部参考链接
+  }),
+});
+
+const blockchain = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    titleZh: z.string().optional(),
+    pubDate: z.date(),
+    description: z.string().optional(),
+    chains: z.array(z.string()).optional(),   // 链名标签，如 ["ETH", "SOL"]
+    refs: z.array(z.string().url()).optional(),
+  }),
+});
+
+const crypto = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    titleZh: z.string().optional(),
+    pubDate: z.date(),
+    description: z.string().optional(),
+    coins: z.array(z.string()).optional(),    // 币种标签，如 ["BTC", "ETH"]
+    refs: z.array(z.string().url()).optional(),
+  }),
+});
+
+export const collections = { blog, books, links, tracks, videos, ai, blockchain, crypto };

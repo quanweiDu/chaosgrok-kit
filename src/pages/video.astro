@@ -5,18 +5,67 @@ import { getCollection } from 'astro:content';
 const allVideos = await getCollection('videos');
 const sorted = allVideos.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const platformColors: Record<string, string> = {
-  'YouTube': '#ff4444',
-  'B站': '#00a1d6',
-  '抖音': '#000000',
-  'Vimeo': '#1ab7ea',
-  '自制': '#6b6b6b',
-  '其他': '#6b6b6b',
-};
+type EmbedType = 'self' | 'youtube' | 'vimeo' | 'bilibili' | 'external';
 
-function getYoutubeThumbnail(url: string): string | null {
-  const match = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
+interface EmbedInfo {
+  type: EmbedType;
+  embedUrl: string | null;
+  label: string;
+  color: string;
+}
+
+function detectEmbed(url: string | undefined, file: string | undefined, platform: string | undefined): EmbedInfo {
+  // 自制：用本地文件
+  if (platform === '自制' || file) {
+    return { type: 'self', embedUrl: null, label: '自制', color: '#6b6b6b' };
+  }
+
+  if (!url) return { type: 'external', embedUrl: null, label: '外部', color: '#6b6b6b' };
+
+  // YouTube
+  const ytMatch = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) {
+    return {
+      type: 'youtube',
+      embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}`,
+      label: 'YouTube',
+      color: '#ff4444',
+    };
+  }
+
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeoMatch) {
+    return {
+      type: 'vimeo',
+      embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
+      label: 'Vimeo',
+      color: '#1ab7ea',
+    };
+  }
+
+  // B站
+  const bvMatch = url.match(/bilibili\.com\/video\/(BV[a-zA-Z0-9]+)/);
+  const avMatch = url.match(/bilibili\.com\/video\/av(\d+)/);
+  if (bvMatch) {
+    return {
+      type: 'bilibili',
+      embedUrl: `https://player.bilibili.com/player.html?bvid=${bvMatch[1]}&autoplay=0`,
+      label: 'B站',
+      color: '#00a1d6',
+    };
+  }
+  if (avMatch) {
+    return {
+      type: 'bilibili',
+      embedUrl: `https://player.bilibili.com/player.html?aid=${avMatch[1]}&autoplay=0`,
+      label: 'B站',
+      color: '#00a1d6',
+    };
+  }
+
+  // 其他外链
+  return { type: 'external', embedUrl: null, label: platform || '外部', color: '#6b6b6b' };
 }
 ---
 
@@ -31,52 +80,56 @@ function getYoutubeThumbnail(url: string): string | null {
 
     <div class="video-list">
       {sorted.map((video) => {
-        const isSelf = video.data.platform === '自制';
+        const embed = detectEmbed(video.data.url, video.data.file, video.data.platform);
         const dateStr = video.data.pubDate.toISOString().slice(0, 7).replace('-', '.');
         const slug = video.slug;
         return (
           <div class="video-item" data-slug={slug}>
-            {isSelf && video.data.file ? (
+            {embed.type === 'self' ? (
               <div class="video-player-wrap">
                 <video class="video-player" controls preload="metadata">
                   <source src={video.data.file} type="video/mp4" />
                 </video>
               </div>
+            ) : embed.embedUrl ? (
+              <div class="video-embed-wrap">
+                <iframe
+                  src={embed.embedUrl}
+                  title={video.data.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  loading="lazy"
+                  class="video-iframe"
+                ></iframe>
+              </div>
             ) : (
               <div class="video-embed-wrap">
-                {video.data.platform === 'YouTube' && getYoutubeThumbnail(video.data.url) ? (
-                  <iframe
-                    src={`https://www.youtube.com/embed/${video.data.url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]}`}
-                    title={video.data.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                    loading="lazy"
-                    class="video-iframe"
-                  ></iframe>
-                ) : (
-                  <a href={video.data.url} target="_blank" rel="noopener" class="video-thumb-wrap">
+                <a href={video.data.url} target="_blank" rel="noopener" class="video-thumb-wrap">
+                  {video.data.cover ? (
+                    <img src={video.data.cover} alt={video.data.title} class="video-thumb-img" />
+                  ) : (
                     <div class="video-thumb-placeholder">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="32" height="32">
                         <circle cx="12" cy="12" r="10"/>
                         <polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/>
                       </svg>
                     </div>
-                    <span class="video-platform-badge" style={`background: ${platformColors[video.data.platform]}`}>
-                      {video.data.platform}
-                    </span>
-                  </a>
-                )}
+                  )}
+                  <span class="video-platform-badge" style={`background: ${embed.color}`}>
+                    {embed.label}
+                  </span>
+                </a>
               </div>
             )}
 
             <div class="video-meta">
               <div class="video-meta-top">
-                <span class="video-platform" style={`color: ${platformColors[video.data.platform]}`}>
-                  {video.data.platform}
+                <span class="video-platform" style={`color: ${embed.color}`}>
+                  {embed.label}
                 </span>
                 <span class="video-date">{dateStr}</span>
               </div>
-              {isSelf ? (
+              {embed.type === 'self' ? (
                 <h2 class="video-name">{video.data.title}</h2>
               ) : (
                 <div class="video-name-row">

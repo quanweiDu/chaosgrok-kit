@@ -1,6 +1,8 @@
 backend:
-  name: git-gateway
-  branch: master
+  name: proxy
+  proxy_url: http://localhost:8081/api/v1
+
+local_backend: true
 
 media_folder: public/images
 public_folder: /images
@@ -65,7 +67,7 @@ collections:
       - { label: "英文书名", name: title, widget: string }
       - { label: "中文书名（可选）", name: titleZh, widget: string, required: false }
       - { label: "价格", name: price, widget: string, hint: "如 $19.99" }
-      - { label: "购买链接 (Gumroad)", name: buyLink, widget: string }
+      - { label: "购买链接 (Gumroad)", name: buyLink, widget: string, hint: "完整链接，如 https://yourname.gumroad.com/l/xxx" }
       - { label: "英文简介", name: description, widget: string }
       - { label: "中文简介（可选）", name: descriptionZh, widget: string, required: false }
       - { label: "书籍详情", name: body, widget: markdown }
@@ -81,8 +83,85 @@ collections:
       - label: "平台"
         name: platform
         widget: select
-        options: ["YouTube", "B站", "抖音", "Vimeo", "其他"]
-      - { label: "视频链接", name: url, widget: string, hint: "粘贴视频完整链接即可" }
+        options: ["自制", "YouTube", "B站", "抖音", "Vimeo", "其他"]
+        hint: "自制 = 网站内直接播放；其他平台 = 跳转外链观看"
+      - label: "本地文件路径（仅自制填写）"
+        name: file
+        widget: string
+        required: false
+        hint: "仅平台选「自制」时填写，如 /video/xxx.mp4"
+      - label: "外部链接（非自制填写）"
+        name: url
+        widget: string
+        required: false
+        hint: "仅平台选「YouTube / B站 / 抖音 / Vimeo / 其他」时填写，粘贴完整链接"
+      - { label: "封面图（可选）", name: cover, widget: image, required: false, hint: "外链视频建议上传封面图" }
       - { label: "发布日期", name: pubDate, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
       - { label: "英文简介（可选）", name: description, widget: string, required: false }
       - { label: "中文简介（可选）", name: descriptionZh, widget: string, required: false }
+
+  - name: ai
+    label: "🤖 AI"
+    folder: src/content/ai
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: title, widget: string }
+      - { label: "中文标题（可选）", name: titleZh, widget: string, required: false }
+      - { label: "发布日期", name: pubDate, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "简介（可选）", name: description, widget: string, required: false }
+      - label: "相关模型/工具（可选）"
+        name: models
+        widget: list
+        required: false
+        hint: "如 GPT-4、Claude、Gemini，每行一个"
+      - label: "参考链接（可选）"
+        name: refs
+        widget: list
+        required: false
+        hint: "外部参考资料链接，每行一个完整链接"
+      - { label: "正文", name: body, widget: markdown }
+
+  - name: blockchain
+    label: "⛓️ Blockchain 区块链"
+    folder: src/content/blockchain
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: title, widget: string }
+      - { label: "中文标题（可选）", name: titleZh, widget: string, required: false }
+      - { label: "发布日期", name: pubDate, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "简介（可选）", name: description, widget: string, required: false }
+      - label: "相关链名（可选）"
+        name: chains
+        widget: list
+        required: false
+        hint: "如 ETH、SOL、BTC，每行一个"
+      - label: "参考链接（可选）"
+        name: refs
+        widget: list
+        required: false
+        hint: "外部参考资料链接，每行一个完整链接"
+      - { label: "正文", name: body, widget: markdown }
+
+  - name: crypto
+    label: "💰 Crypto 加密货币"
+    folder: src/content/crypto
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: title, widget: string }
+      - { label: "中文标题（可选）", name: titleZh, widget: string, required: false }
+      - { label: "发布日期", name: pubDate, widget: datetime, format: "YYYY-MM-DD", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "简介（可选）", name: description, widget: string, required: false }
+      - label: "相关币种（可选）"
+        name: coins
+        widget: list
+        required: false
+        hint: "如 BTC、ETH、SOL，每行一个"
+      - label: "参考链接（可选）"
+        name: refs
+        widget: list
+        required: false
+        hint: "外部参考资料链接，每行一个完整链接"
+      - { label: "正文", name: body, widget: markdown }
