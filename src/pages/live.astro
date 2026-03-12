@@ -1,0 +1,525 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 配置区 — 改这里，不用动下面任何代码
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const config = {
+
+  // 直播状态：'live' | 'upcoming' | 'offline'
+  status: 'upcoming',
+
+  // 直播流地址（YouTube / B站 / Cloudflare Stream 等任意平台 iframe 地址）
+  streamUrl: '',
+
+  // 本期主题
+  episode: {
+    num: '001',
+    title: 'How to think in chaos.',
+    titleZh: '如何在混沌中思考。',
+    desc: '信息过载的时代，大多数人的困境不是知道得太少，而是框架不清。这期聊清楚这件事。',
+  },
+
+  // 下次开播时间（status 为 upcoming 时显示倒计时）
+  nextStream: '2026-03-20T20:00:00+08:00',
+
+  // 相关内容
+  relatedBook: {
+    show: true,
+    title: 'Zero to Minimal',
+    titleZh: '从零到极简',
+    price: '$19.99',
+    url: '',
+  },
+  relatedConsult: {
+    show: true,
+    url: '/consult',
+  },
+
+  // 平台（留空则不显示）
+  platforms: {
+    youtube: '',
+    bilibili: '',
+    twitter: '',
+  },
+};
+
+const nextDate = new Date(config.nextStream).toLocaleDateString('zh-CN', {
+  year: 'numeric', month: 'long', day: 'numeric',
+  hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Shanghai'
+});
+---
+
+<Layout title="Live · chaosgrok" description="实时直播。内容在这里，不在别处。">
+
+<!-- Hero：左标题 + 右倒计时，一屏内全看到 -->
+<div class="live-hero">
+  <div class="live-hero-left">
+    <p class="hero-label">
+      {config.status === 'live'     && '● Live · 正在直播'}
+      {config.status === 'upcoming' && '■ Upcoming · 即将开播'}
+      {config.status === 'offline'  && '○ Offline · 暂未开播'}
+    </p>
+    <h1>Live.<br><em>实时。</em></h1>
+    <p class="hero-sub">内容在这里，不在别处。</p>
+  </div>
+
+  <div class="live-hero-right">
+    {config.status === 'upcoming' && (
+      <div class="countdown-block">
+        <div class="countdown-label">距离开播还有</div>
+        <div class="countdown" id="countdown">-- : -- : --</div>
+        <div class="countdown-date">{nextDate}</div>
+      </div>
+    )}
+    {config.status === 'offline' && (
+      <div class="offline-block">
+        <p class="offline-text">暂无直播安排。</p>
+        <p class="offline-sub">订阅 RSS 或关注下方平台，第一时间获得通知。</p>
+      </div>
+    )}
+    {config.status === 'live' && (
+      <div class="live-hint">
+        <p class="live-hint-label">正在直播中</p>
+        <p class="live-hint-sub">↓ 向下滚动观看</p>
+      </div>
+    )}
+  </div>
+</div>
+
+<!-- 播放器（仅开播时显示） -->
+{config.status === 'live' && config.streamUrl && (
+  <div class="player-section">
+    <div class="player-inner">
+      <div class="player-wrap">
+        <iframe
+          src={config.streamUrl}
+          allow="autoplay; fullscreen"
+          allowfullscreen
+          frameborder="0"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+)}
+
+<!-- 本期主题 -->
+<section class="episode-section">
+  <div class="section-inner">
+    <div class="section-label reveal">本期 · Episode {config.episode.num}</div>
+    <div class="episode-grid">
+      <h2 class="reveal">{config.episode.title}</h2>
+      <div class="episode-right reveal">
+        <p class="episode-zh">{config.episode.titleZh}</p>
+        <p class="episode-desc">{config.episode.desc}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 相关内容 -->
+{(config.relatedBook.show || config.relatedConsult.show) && (
+  <section class="related-section">
+    <div class="section-inner">
+      <div class="section-label reveal">相关 · Related</div>
+      <div class="related-grid">
+        {config.relatedBook.show && (
+          <div class="related-card reveal">
+            <div class="card-type">Electronic Book · 电子书</div>
+            <div class="card-title">{config.relatedBook.title}</div>
+            <div class="card-title-zh">{config.relatedBook.titleZh}</div>
+            <div class="card-footer">
+              <span class="card-price">{config.relatedBook.price}</span>
+              {config.relatedBook.url
+                ? <a href={config.relatedBook.url} class="card-link">购买 →</a>
+                : <span class="card-soon">即将上架</span>
+              }
+            </div>
+          </div>
+        )}
+        {config.relatedConsult.show && (
+          <div class="related-card reveal">
+            <div class="card-type">Consulting · 咨询服务</div>
+            <div class="card-title">One-on-one.</div>
+            <div class="card-title-zh">一对一深度咨询</div>
+            <div class="card-footer">
+              <a href={config.relatedConsult.url} class="card-link">了解详情 →</a>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+)}
+
+<!-- 平台 -->
+{(config.platforms.youtube || config.platforms.bilibili || config.platforms.twitter) && (
+  <section class="platforms-section">
+    <div class="section-inner">
+      <div class="section-label reveal">同步 · Platforms</div>
+      <div class="platforms-row">
+        {config.platforms.youtube && (
+          <a href={config.platforms.youtube} class="platform-link reveal" target="_blank" rel="noopener">
+            <span class="platform-name">YouTube</span>
+            <span class="platform-arrow">→</span>
+          </a>
+        )}
+        {config.platforms.bilibili && (
+          <a href={config.platforms.bilibili} class="platform-link reveal" target="_blank" rel="noopener">
+            <span class="platform-name">Bilibili</span>
+            <span class="platform-arrow">→</span>
+          </a>
+        )}
+        {config.platforms.twitter && (
+          <a href={config.platforms.twitter} class="platform-link reveal" target="_blank" rel="noopener">
+            <span class="platform-name">Twitter / X</span>
+            <span class="platform-arrow">→</span>
+          </a>
+        )}
+      </div>
+    </div>
+  </section>
+)}
+
+</Layout>
+
+<script>
+  // 倒计时
+  const el = document.getElementById('countdown');
+  const target = new Date('2026-03-20T20:00:00+08:00').getTime();
+  function tick() {
+    if (!el) return;
+    const diff = target - Date.now();
+    if (diff <= 0) { el.textContent = '00 : 00 : 00'; return; }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = `${String(h).padStart(2,'0')} : ${String(m).padStart(2,'0')} : ${String(s).padStart(2,'0')}`;
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // scroll reveal
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+
+<style>
+  /* ── Hero ── */
+  .live-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 60vh;
+    max-width: 1080px;
+    margin: 0 auto;
+    width: 100%;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .live-hero-left {
+    padding: 140px 40px 80px;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+
+  .hero-label {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.1s forwards;
+  }
+
+  .live-hero-left h1 {
+    font-family: var(--serif-en);
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--ink);
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.2s forwards;
+  }
+
+  .live-hero-left h1 em {
+    font-style: italic;
+    color: var(--ink-light);
+  }
+
+  .hero-sub {
+    font-family: var(--serif-zh);
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.8;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.3s forwards;
+  }
+
+  .live-hero-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.3s forwards;
+  }
+
+  /* 倒计时 */
+  .countdown-block { text-align: center; }
+  .countdown-label {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-bottom: 24px;
+  }
+  .countdown {
+    font-family: var(--serif-en);
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  .countdown-date {
+    font-size: 12px;
+    color: var(--ink-ghost);
+    letter-spacing: 0.1em;
+  }
+
+  /* offline */
+  .offline-block { text-align: center; }
+  .offline-text {
+    font-family: var(--serif-en);
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .offline-sub {
+    font-size: 13px;
+    color: var(--ink-ghost);
+    max-width: 240px;
+  }
+
+  /* live hint */
+  .live-hint { text-align: center; }
+  .live-hint-label {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-bottom: 12px;
+  }
+  .live-hint-sub { font-size: 13px; color: var(--ink-ghost); }
+
+  /* ── 播放器 ── */
+  .player-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+  .player-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: #0d0d0d;
+  }
+  .player-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  /* ── 通用 section 结构 ── */
+  .episode-section,
+  .related-section,
+  .platforms-section {
+    padding: 80px 0;
+  }
+
+  .section-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section-label {
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* ── 本期主题 ── */
+  .episode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .episode-grid h2 {
+    font-family: var(--serif-en);
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .episode-zh {
+    font-family: var(--serif-zh);
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .episode-desc {
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 2;
+  }
+
+  /* ── 相关内容 ── */
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+  .related-card {
+    padding: 40px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card-type {
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+  }
+  .card-title {
+    font-family: var(--serif-en);
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .card-title-zh {
+    font-family: var(--serif-zh);
+    font-size: 13px;
+    color: var(--ink-ghost);
+  }
+  .card-footer {
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-price {
+    font-family: var(--serif-en);
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .card-link {
+    font-family: var(--serif-en);
+    font-size: 13px;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+    transition: opacity 0.2s;
+  }
+  .card-link:hover { opacity: 0.5; }
+  .card-soon {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-ghost);
+  }
+
+  /* ── 平台 ── */
+  .platforms-row {
+    display: flex;
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+  .platform-link {
+    flex: 1;
+    padding: 32px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .platform-link:hover { opacity: 0.5; }
+  .platform-name {
+    font-family: var(--serif-en);
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .platform-arrow {
+    font-family: var(--serif-en);
+    font-size: 16px;
+    color: var(--ink-ghost);
+  }
+
+  /* ── 动画 ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── 响应式 ── */
+  @media (max-width: 768px) {
+    .live-hero { grid-template-columns: 1fr; min-height: auto; }
+    .live-hero-left { padding: 110px 20px 60px; border-right: none; border-bottom: 1px solid var(--rule); }
+    .live-hero-right { padding: 48px 20px; }
+    .section-inner { padding: 0 20px; }
+    .episode-grid { grid-template-columns: 1fr; gap: 32px; }
+    .player-inner { padding: 32px 20px; }
+    .platforms-row { flex-direction: column; }
+  }
+</style>

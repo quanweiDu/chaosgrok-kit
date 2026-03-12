@@ -334,7 +334,7 @@ main { flex: 1; }
 /* ============================================================
    书籍卡片
    ============================================================ */
-.books-section { padding: 72px 0; }
+.books-section { padding: 72px 0; background: var(--off-white); }
 
 .book-grid {
   display: grid;
@@ -758,6 +758,7 @@ main { flex: 1; }
   max-width: var(--max-w);
   margin: 0 auto;
   width: 100%;
+  border-bottom: 1px solid var(--rule-light);
   margin-bottom: 64px;
 }
 

@@ -22,9 +22,10 @@ const books = await getCollection('books');
       ) : (
         <div class="book-grid">
           {books.map(b => (
-            <div class="book-card" onclick={`window.location='/books/${b.slug}'`} style="cursor:pointer;">
+            <a href={`/books/${b.slug}`} class="book-card">
               <span class="book-tag">Electronic Book · 电子书</span>
 
+              {/* 有封面图就显示图片，没有就显示首字母 */}
               {b.data.cover ? (
                 <img src={b.data.cover} alt={b.data.title} class="book-cover-img" />
               ) : (
@@ -38,12 +39,9 @@ const books = await getCollection('books');
               <p class="book-desc">{b.data.descriptionZh ?? b.data.description}</p>
               <div class="book-footer">
                 <span class="book-price-tag">{b.data.price}</span>
-                {b.data.buyLink
-                  ? <a href={b.data.buyLink} target="_blank" rel="noopener" class="book-buy-btn" onclick="event.stopPropagation()">购买 →</a>
-                  : <span class="book-arrow">即将上架</span>
-                }
+                <span class="book-arrow">→</span>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       )}
@@ -72,16 +70,4 @@ const books = await getCollection('books');
     font-weight: 400;
     color: var(--ink-ghost);
   }
-
-  .book-buy-btn {
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--ink);
-    text-decoration: none;
-    border-bottom: 1px solid var(--ink);
-    padding-bottom: 1px;
-    transition: opacity 0.2s;
-  }
-  .book-buy-btn:hover { opacity: 0.5; }
 </style>

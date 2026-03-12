@@ -114,7 +114,6 @@ const tracksData = trackEntries
         <li><a href="/video">Video</a></li>
         <li><a href="/links">Links</a></li>
         <li><a href="/about">About</a></li>
-        <li><a href="/live" class="nav-live">Live</a></li>
         <li><a href="/consult">咨询</a></li>
         <li>
           <a href="/search" class="nav-search" title="搜索">
@@ -181,29 +180,6 @@ const tracksData = trackEntries
 
 <style is:global>
   body.player-open { padding-bottom: 64px; }
-
-  .nav-live {
-    position: relative;
-  }
-  .nav-live::after {
-    content: '';
-    position: absolute;
-    top: -2px;
-    right: -6px;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #2a9a5a;
-    display: none;
-  }
-  .nav-live.is-live::after {
-    display: block;
-    animation: pulse-dot 1.5s ease infinite;
-  }
-  @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 0 2px rgba(42,154,90,0.2); }
-    50%       { box-shadow: 0 0 0 4px rgba(42,154,90,0.1); }
-  }
 
   .global-player {
     position: fixed;
