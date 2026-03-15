@@ -1,4 +1,4 @@
-# chaosgrok-kit
+# Groundwork
 
 **Own your content. Own your stream. Own your audience.**
 
@@ -42,7 +42,7 @@ You stay at the center. Platforms become optional distribution channels, not gat
 ## What's inside
 
 ```
-chaosgrok-kit/
+Groundwork/
 ├── Astro website          — fast static site, deploys to Cloudflare Pages (free)
 ├── Decap CMS              — browser-based content editor, no code needed
 ├── Live streaming         — self-hosted via nginx-rtmp + OBS
@@ -80,8 +80,8 @@ Total running cost: **~$10/year** (just your domain)
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/yourusername/chaosgrok-kit.git
-cd chaosgrok-kit
+git clone https://github.com/quanweiDu/groundwork.git
+cd Groundwork
 npm install
 ```
 
