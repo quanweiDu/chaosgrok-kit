@@ -54,6 +54,18 @@ This is your ground. No one gets to delete it.
 
 ---
 
+Before I graduated, I picked a fight with my police academy. Now I'm picking a fight with the platforms.
+
+Whether I win or lose is a separate question. First you fight.
+
+I have no team. No supply line. No backing. Just one person who refuses to accept that platforms get to bully creators into silence.
+
+To every programmer, every builder, every individual out there — help me. Help us.
+
+The whole world is our depth.
+
+---
+
 # 我为什么要自己建一套东西
 
 三天两头被微信封号，文章被删，没有任何解释。
@@ -99,6 +111,16 @@ This is your ground. No one gets to delete it.
 分散的节点，分散的声音。每一个人建立自己的地盘，大平台的垄断就少一分。这不是技术问题，是每个创作者都能做的选择。
 
 这是你的地盘。没有人可以删掉它。
+
+---
+
+毕业之前和警校干了一仗，现在要和各大平台干一仗。打得过打不过是两码事，先打再说。
+
+我一个人势单力薄，没有队友，没有补给线，没有团队。但我不能忍受平台霸凌。
+
+所有程序员、天才、个人——助我，助我们。
+
+世界就是我们的纵深。
 
 ---
 
