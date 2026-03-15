@@ -1,5 +1,5 @@
 ---
-// PostToolbar.astro — 通用分享工具栏
+// PostToolbar.astro — 通用分享工具栏，文章、书籍、视频、音乐详情页均可使用
 ---
 
 <div class="post-toolbar">
@@ -31,101 +31,102 @@
 
 <script>
   function initToolbar() {
+    const url = window.location.href;
     const slug = window.location.pathname;
-    const url  = window.location.href;
     const title = document.title;
 
-    // ── 点赞 ──
-    const likeBtn   = document.getElementById('like-btn');
-    const likeIcon  = document.getElementById('like-icon');
+    // 点赞
+    const likeBtn = document.getElementById('like-btn');
+    const likeIcon = document.getElementById('like-icon');
     const likeCount = document.getElementById('like-count');
     let liked = localStorage.getItem('liked:' + slug) === '1';
     let likes = parseInt(localStorage.getItem('likes:' + slug) || '0');
 
-    function renderLike() {
+    function updateLike() {
       if (likeCount) likeCount.textContent = String(likes);
-      if (likeIcon)  likeIcon.setAttribute('fill', liked ? 'currentColor' : 'none');
-      if (likeBtn)   likeBtn.classList.toggle('active-like', liked);
+      if (likeIcon) likeIcon.setAttribute('fill', liked ? 'currentColor' : 'none');
+      if (likeBtn) likeBtn.classList.toggle('active-like', liked);
     }
-    renderLike();
+    updateLike();
+
     likeBtn?.addEventListener('click', () => {
       liked = !liked;
       likes = liked ? likes + 1 : Math.max(0, likes - 1);
       localStorage.setItem('liked:' + slug, liked ? '1' : '0');
       localStorage.setItem('likes:' + slug, String(likes));
-      renderLike();
+      updateLike();
     });
 
-    // ── 收藏 ──
-    const bookmarkBtn   = document.getElementById('bookmark-btn');
-    const bookmarkIcon  = document.getElementById('bookmark-icon');
+    // 收藏
+    const bookmarkBtn = document.getElementById('bookmark-btn');
+    const bookmarkIcon = document.getElementById('bookmark-icon');
     const bookmarkCount = document.getElementById('bookmark-count');
     let bookmarked = localStorage.getItem('bookmarked:' + slug) === '1';
-    let bookmarks  = parseInt(localStorage.getItem('bookmarks:' + slug) || '0');
+    let bookmarks = parseInt(localStorage.getItem('bookmarks:' + slug) || '0');
 
-    function renderBookmark() {
+    function updateBookmark() {
       if (bookmarkCount) bookmarkCount.textContent = String(bookmarks);
-      if (bookmarkIcon)  bookmarkIcon.setAttribute('fill', bookmarked ? 'currentColor' : 'none');
-      if (bookmarkBtn)   bookmarkBtn.classList.toggle('active-bookmark', bookmarked);
+      if (bookmarkIcon) bookmarkIcon.setAttribute('fill', bookmarked ? 'currentColor' : 'none');
+      if (bookmarkBtn) bookmarkBtn.classList.toggle('active-bookmark', bookmarked);
     }
-    renderBookmark();
+    updateBookmark();
+
     bookmarkBtn?.addEventListener('click', () => {
       bookmarked = !bookmarked;
       bookmarks = bookmarked ? bookmarks + 1 : Math.max(0, bookmarks - 1);
       localStorage.setItem('bookmarked:' + slug, bookmarked ? '1' : '0');
       localStorage.setItem('bookmarks:' + slug, String(bookmarks));
-      renderBookmark();
+      updateBookmark();
     });
 
-    // ── 分享下拉 ──
-    const trigger  = document.getElementById('share-trigger');
+    // 分享下拉
+    const trigger = document.getElementById('share-trigger');
     const dropdown = document.getElementById('share-dropdown');
-    if (!trigger || !dropdown) return;
 
-    // 克隆清除旧事件
-    const t = trigger.cloneNode(true) as HTMLElement;
-    trigger.parentNode?.replaceChild(t, trigger);
-
-    t.addEventListener('click', (e) => {
+    function toggleDropdown(e: Event) {
       e.preventDefault();
       e.stopPropagation();
-      dropdown.classList.toggle('open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!t.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
-        dropdown.classList.remove('open');
-      }
-    });
-
-    // 复制链接（兼容 HTTP）
-    document.getElementById('copy-link')?.addEventListener('click', () => {
-      const el = document.getElementById('copy-link');
-      const done = () => {
-        if (el) { el.textContent = '已复制 ✓'; setTimeout(() => { el.textContent = '复制链接'; }, 2000); }
-        dropdown.classList.remove('open');
-      };
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(done).catch(() => fallbackCopy(url, done));
-      } else {
-        fallbackCopy(url, done);
-      }
-    });
-
-    function fallbackCopy(text: string, cb: () => void) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      cb();
+      dropdown?.classList.toggle('open');
     }
 
-    // 分享链接
+    // 只用 click，不重复绑定 touch
+    trigger?.addEventListener('click', toggleDropdown);
+
+    document.addEventListener('click', (e) => {
+      if (!trigger?.contains(e.target as Node) && !dropdown?.contains(e.target as Node)) {
+        dropdown?.classList.remove('open');
+      }
+    });
+
+    // 复制链接（兼容 HTTP 和 HTTPS）
+    document.getElementById('copy-link')?.addEventListener('click', () => {
+      const el = document.getElementById('copy-link');
+      const copy = () => {
+        if (el) { el.textContent = '已复制 ✓'; setTimeout(() => el.textContent = '复制链接', 2000); }
+        dropdown?.classList.remove('open');
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(copy).catch(() => {
+          // fallback
+          const ta = document.createElement('textarea');
+          ta.value = url;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          copy();
+        });
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        copy();
+      }
+    });
+
     const shareX = document.getElementById('share-x') as HTMLAnchorElement;
     if (shareX) shareX.href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
 
@@ -137,9 +138,7 @@
   }
 
   initToolbar();
-  document.addEventListener('astro:page-load', () => {
-    setTimeout(initToolbar, 50);
-  });
+  document.addEventListener('astro:page-load', initToolbar);
 </script>
 
 <style>
@@ -175,12 +174,14 @@
   .toolbar-btn.active-bookmark svg { fill: currentColor; }
 
   .toolbar-space { flex: 1; }
+
   .share-wrap { position: relative; }
 
   .share-dropdown {
     position: absolute;
     bottom: calc(100% + 16px);
     right: 0;
+    background: none;
     min-width: 140px;
     z-index: 100;
     opacity: 0;
@@ -217,4 +218,5 @@
   }
 
   .share-item:hover { color: var(--ink); }
+  .share-item:last-child { border-bottom: none; }
 </style>
