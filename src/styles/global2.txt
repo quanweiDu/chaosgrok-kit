@@ -1,0 +1,836 @@
+/* 字体由 Layout.astro <head> 中的 <link> 加载，不在此处 @import */
+
+/* 降级字体尺寸微调 — 减少字体加载后的布局偏移 */
+@font-face {
+  font-family: 'EB Garamond';
+  src: local('Georgia');
+  font-weight: 400;
+  size-adjust: 105%;
+  ascent-override: 90%;
+}
+/* ============================================================
+   CSS 变量
+   ============================================================ */
+:root {
+  --white:      #ffffff;
+  --off-white:  #fafaf9;
+  --bg:         #ffffff;
+  --ink:        #0f0f0f;
+  --ink-light:  #6b6b6b;
+  --ink-ghost:  #b8b8b4;
+  --rule:       #e8e8e4;
+  --rule-light: #f2f2ef;
+
+  /* 字体降级链：Google Fonts → 系统衬线 → 通用衬线 */
+  --serif-en: 'EB Garamond', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --serif-zh: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', '宋体', serif;
+
+  --max-w: 1080px;
+  --max-w-text: 660px;
+}
+
+/* ============================================================
+   全局复位
+   ============================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 0 !important;
+}
+
+html {
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--serif-en);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img { display: block; max-width: 100%; }
+
+/* ============================================================
+   入场动画
+   ============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-1 { animation: fadeUp 0.7s ease both; }
+.fade-2 { animation: fadeUp 0.7s 0.12s ease both; }
+.fade-3 { animation: fadeUp 0.7s 0.24s ease both; }
+.fade-4 { animation: fadeUp 0.7s 0.36s ease both; }
+
+/* ============================================================
+   导航 — 毛玻璃 + hover 底线
+   ============================================================ */
+.site-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s ease;
+}
+
+.site-nav:hover { border-color: var(--rule); }
+
+.nav-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: var(--serif-en);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  transition: color 0.2s;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+  transform-origin: left;
+}
+
+.nav-links a:hover { color: var(--ink); }
+.nav-links a:hover::after { transform: scaleX(1); }
+
+.nav-search {
+  display: flex !important;
+  align-items: center;
+  color: var(--ink-ghost) !important;
+  padding: 0 !important;
+}
+.nav-search::after { display: none !important; }
+.nav-search:hover { color: var(--ink) !important; }
+
+/* ============================================================
+   容器
+   ============================================================ */
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
+}
+
+.container-text {
+  max-width: var(--max-w-text);
+  margin: 0 auto;
+  padding: 0 40px;
+  width: 100%;
+}
+
+main { flex: 1; }
+
+/* ============================================================
+   区块标题
+   ============================================================ */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.section-label span {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-ghost);
+  white-space: nowrap;
+  font-family: var(--serif-en);
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* ============================================================
+   Hero 首页
+   ============================================================ */
+.hero {
+  padding: 160px 40px 120px;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-label {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-ghost);
+  margin-bottom: 36px;
+  font-family: var(--serif-en);
+}
+
+.hero h1 {
+  font-family: var(--serif-en);
+  font-size: clamp(40px, 5.5vw, 72px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  max-width: 700px;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--ink-light);
+}
+
+.hero-sub {
+  margin-top: 28px;
+  font-family: var(--serif-zh);
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--ink-light);
+  line-height: 1.9;
+  max-width: 460px;
+}
+
+.hero-rule {
+  margin-top: 56px;
+  width: 32px;
+  height: 1px;
+  background: var(--ink-ghost);
+}
+
+/* ============================================================
+   文章列表
+   ============================================================ */
+.writings { padding: 72px 0; }
+
+.post-list { list-style: none; }
+
+.post-item { border-top: 1px solid var(--rule-light); }
+.post-item:last-child { border-bottom: 1px solid var(--rule-light); }
+
+.post-link {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  align-items: center;
+  gap: 28px;
+  padding: 22px 0;
+  text-decoration: none;
+  color: inherit;
+  transition: padding-left 0.3s ease;
+}
+
+.post-link:hover { padding-left: 10px; }
+
+.post-num {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-ghost);
+  font-family: var(--serif-en);
+  font-style: italic;
+}
+
+.post-title-wrap { display: flex; flex-direction: column; gap: 4px; }
+
+.post-title {
+  font-family: var(--serif-en);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.post-title-zh {
+  font-family: var(--serif-zh);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink-light);
+}
+
+.post-date {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-ghost);
+  white-space: nowrap;
+  font-family: var(--serif-en);
+}
+
+/* 空状态 */
+.empty-state {
+  padding: 80px 0;
+  text-align: center;
+}
+
+.empty-state p {
+  font-family: var(--serif-en);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink-ghost);
+  line-height: 1.8;
+}
+
+.empty-state-zh {
+  font-family: var(--serif-zh);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink-ghost);
+  margin-top: 8px;
+}
+
+/* ============================================================
+   书籍卡片
+   ============================================================ */
+.books-section { padding: 72px 0; }
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2px;
+}
+
+.book-card {
+  background: var(--white);
+  padding: 40px 36px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 48px rgba(0,0,0,0.07);
+}
+
+.book-tag {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-ghost);
+  font-family: var(--serif-en);
+}
+
+.book-title-en {
+  font-family: var(--serif-en);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.book-title-zh {
+  font-family: var(--serif-zh);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink-light);
+}
+
+.book-desc {
+  font-size: 14px;
+  color: var(--ink-light);
+  line-height: 1.75;
+  font-family: var(--serif-zh);
+  font-weight: 300;
+  flex: 1;
+  margin-top: 4px;
+}
+
+.book-footer {
+  margin-top: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.book-price-tag {
+  font-family: var(--serif-en);
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.book-arrow {
+  font-size: 16px;
+  color: var(--ink-ghost);
+  transition: transform 0.25s ease, color 0.2s;
+}
+
+.book-card:hover .book-arrow {
+  transform: translateX(5px);
+  color: var(--ink);
+}
+
+/* ============================================================
+   About 条带（首页）
+   ============================================================ */
+.about-strip {
+  padding: 96px 0;
+  border-top: 1px solid var(--rule-light);
+}
+
+.about-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.about-left h2 {
+  font-family: var(--serif-en);
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.about-left h2 em {
+  font-style: italic;
+  color: var(--ink-light);
+}
+
+.about-right p {
+  font-family: var(--serif-zh);
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--ink-light);
+  line-height: 1.95;
+  margin-bottom: 18px;
+}
+
+.about-right p:last-child { margin-bottom: 0; }
+
+/* ============================================================
+   文章详情页 + 阅读进度条
+   ============================================================ */
+.reading-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 1px;
+  background: var(--ink-ghost);
+  width: 0%;
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+.article-page {
+  padding: 140px 40px 100px;
+  max-width: var(--max-w-text);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.article-meta-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+.back-btn {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-ghost);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.back-btn:hover {
+  color: var(--ink);
+  gap: 12px;
+}
+
+.meta-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--rule);
+}
+
+.article-date-str {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-ghost);
+  font-family: var(--serif-en);
+}
+
+.article-h1 {
+  font-family: var(--serif-en);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.article-h1-zh {
+  font-family: var(--serif-zh);
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--ink-light);
+  margin-bottom: 56px;
+  line-height: 1.6;
+}
+
+.article-body {
+  font-family: var(--serif-zh);
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 2.05;
+  color: #252525;
+}
+
+.article-body p { margin-bottom: 28px; }
+
+.article-body h2 {
+  font-family: var(--serif-en);
+  font-size: 22px;
+  font-weight: 400;
+  margin: 52px 0 20px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.article-body h3 {
+  font-size: 17px;
+  font-weight: 400;
+  margin: 36px 0 14px;
+  font-family: var(--serif-zh);
+}
+
+.article-body ul,
+.article-body ol {
+  padding-left: 1.5em;
+  margin-bottom: 28px;
+}
+
+.article-body li { margin-bottom: 8px; }
+
+.article-body blockquote {
+  border-left: 1px solid var(--rule);
+  padding-left: 24px;
+  margin: 36px 0;
+  color: var(--ink-light);
+  font-style: italic;
+}
+
+.article-body a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ink-ghost);
+  transition: text-decoration-color 0.2s;
+}
+
+.article-body a:hover {
+  text-decoration-color: var(--ink);
+}
+
+/* ============================================================
+   书籍详情页
+   ============================================================ */
+.book-detail-page {
+  padding: 140px 40px 100px;
+  max-width: var(--max-w-text);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.book-detail-h1 {
+  font-family: var(--serif-en);
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.book-detail-subtitle {
+  font-family: var(--serif-zh);
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--ink-light);
+  margin-bottom: 52px;
+}
+
+.book-detail-body {
+  font-family: var(--serif-zh);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 2;
+  color: #252525;
+  margin-bottom: 52px;
+}
+
+.book-detail-body p { margin-bottom: 24px; }
+
+.book-buy-block {
+  border-top: 1px solid var(--rule);
+  padding-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.book-price-big {
+  font-family: var(--serif-en);
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.btn-buy {
+  display: inline-block;
+  padding: 12px 32px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--serif-en);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-buy:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ============================================================
+   About 独立页
+   ============================================================ */
+.about-page {
+  padding: 140px 40px 100px;
+  max-width: var(--max-w-text);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.about-page h1 {
+  font-family: var(--serif-en);
+  font-size: clamp(30px, 4vw, 50px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 56px;
+}
+
+.about-page h1 em {
+  font-style: italic;
+  color: var(--ink-light);
+  font-size: 0.78em;
+  display: block;
+  margin-top: 6px;
+}
+
+.about-body p {
+  font-family: var(--serif-zh);
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 2;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.about-contact {
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+  color: var(--ink-light);
+  font-family: var(--serif-zh);
+  font-weight: 300;
+}
+
+.about-contact a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ============================================================
+   页脚
+   ============================================================ */
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid transparent;
+  padding: 36px 40px;
+  transition: border-color 0.4s ease;
+}
+
+.site-footer:hover { border-color: var(--rule); }
+
+.footer-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-copy {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-ghost);
+  font-family: var(--serif-en);
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-ghost);
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--ink); }
+
+/* ============================================================
+   Blog / Books 列表页头部
+   ============================================================ */
+.list-hero {
+  padding: 140px 40px 80px;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  width: 100%;
+  margin-bottom: 64px;
+}
+
+.list-hero h1 {
+  font-family: var(--serif-en);
+  font-size: clamp(32px, 4.5vw, 56px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.list-hero h1 em {
+  font-style: italic;
+  color: var(--ink-light);
+}
+
+.list-hero p {
+  font-family: var(--serif-zh);
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--ink-light);
+  line-height: 1.8;
+}
+
+/* ============================================================
+   响应式 — 移动端专项调校
+   ============================================================ */
+@media (max-width: 768px) {
+  html { font-size: 16px; }
+
+  /* 导航：只显示 logo 和搜索 */
+  .nav-inner { padding: 0 24px; height: 56px; }
+  .nav-logo { font-size: 13px; }
+  .nav-links { gap: 0; }
+  .nav-links li { display: none; }
+  .nav-links li:last-child { display: flex; } /* 只保留搜索图标 */
+
+  .hero { padding: 110px 20px 80px; }
+  .container { padding: 0 20px; }
+  .container-text { padding: 0 20px; }
+  .list-hero { padding: 110px 20px 60px; }
+
+  .post-link {
+    grid-template-columns: 52px 1fr;
+    gap: 16px;
+    padding: 18px 0;
+  }
+  .post-date { display: none; }
+  .post-title { font-size: 16px; }
+
+  .about-inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .article-page { padding: 100px 20px 80px; }
+  .article-h1 { font-size: clamp(24px, 6vw, 36px); }
+  .article-body { font-size: 16px; line-height: 1.95; }
+
+  .book-detail-page { padding: 100px 20px 80px; }
+  .book-buy-block { flex-direction: column; align-items: flex-start; gap: 20px; }
+
+  .about-page { padding: 100px 20px 80px; }
+
+  .book-grid { grid-template-columns: 1fr; }
+  .book-card { padding: 28px 24px; }
+
+  .site-footer { padding: 28px 20px; }
+  .footer-inner { flex-direction: column; gap: 14px; text-align: center; }
+
+  .section-label { margin-bottom: 32px; }
+  .writings { padding: 48px 0; }
+  .books-section { padding: 48px 0; }
+  .about-strip { padding: 64px 0; }
+}

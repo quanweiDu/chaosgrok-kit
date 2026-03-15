@@ -2,16 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 配置区 — 改这里，不用动下面任何代码
+// 配置区 — 只改这里
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 const config = {
 
-  // 直播状态：'live' | 'upcoming' | 'offline'
-  status: 'upcoming',
-
-  // 直播流地址（YouTube / B站 / Cloudflare Stream 等任意平台 iframe 地址）
-  streamUrl: '',
+  // 直播流地址（页面自动检测是否在播）
+  // 本地：'http://localhost:8080/hls/stream.m3u8'
+  streamUrl: 'http://localhost:8080/hls/stream.m3u8',
 
   // 本期主题
   episode: {
@@ -21,7 +19,7 @@ const config = {
     desc: '信息过载的时代，大多数人的困境不是知道得太少，而是框架不清。这期聊清楚这件事。',
   },
 
-  // 下次开播时间（status 为 upcoming 时显示倒计时）
+  // 下次开播时间
   nextStream: '2026-03-20T20:00:00+08:00',
 
   // 相关内容
@@ -53,56 +51,37 @@ const nextDate = new Date(config.nextStream).toLocaleDateString('zh-CN', {
 
 <Layout title="Live · chaosgrok" description="实时直播。内容在这里，不在别处。">
 
-<!-- Hero：左标题 + 右倒计时，一屏内全看到 -->
-<div class="live-hero">
-  <div class="live-hero-left">
-    <p class="hero-label">
-      {config.status === 'live'     && '● Live · 正在直播'}
-      {config.status === 'upcoming' && '■ Upcoming · 即将开播'}
-      {config.status === 'offline'  && '○ Offline · 暂未开播'}
-    </p>
-    <h1>Live.<br><em>实时。</em></h1>
-    <p class="hero-sub">内容在这里，不在别处。</p>
+<!-- 开播模式（默认隐藏，JS检测到流后显示） -->
+<div class="live-mode" id="live-mode" style="display:none">
+  <div class="live-topbar">
+    <span class="live-topbar-title">Live · <em>实时。</em></span>
+    <span class="live-topbar-badge">
+      <span class="status-dot"></span>
+      正在直播
+    </span>
   </div>
-
-  <div class="live-hero-right">
-    {config.status === 'upcoming' && (
-      <div class="countdown-block">
-        <div class="countdown-label">距离开播还有</div>
-        <div class="countdown" id="countdown">-- : -- : --</div>
-        <div class="countdown-date">{nextDate}</div>
-      </div>
-    )}
-    {config.status === 'offline' && (
-      <div class="offline-block">
-        <p class="offline-text">暂无直播安排。</p>
-        <p class="offline-sub">订阅 RSS 或关注下方平台，第一时间获得通知。</p>
-      </div>
-    )}
-    {config.status === 'live' && (
-      <div class="live-hint">
-        <p class="live-hint-label">正在直播中</p>
-        <p class="live-hint-sub">↓ 向下滚动观看</p>
-      </div>
-    )}
+  <div class="player-full">
+    <div class="player-wrap">
+      <video id="live-video" controls autoplay muted playsinline></video>
+    </div>
   </div>
 </div>
 
-<!-- 播放器（仅开播时显示） -->
-{config.status === 'live' && config.streamUrl && (
-  <div class="player-section">
-    <div class="player-inner">
-      <div class="player-wrap">
-        <iframe
-          src={config.streamUrl}
-          allow="autoplay; fullscreen"
-          allowfullscreen
-          frameborder="0"
-        ></iframe>
-      </div>
+<!-- 未开播模式（默认显示，JS检测到流后隐藏） -->
+<div class="live-hero" id="live-hero">
+  <div class="live-hero-left">
+    <p class="hero-label">■ Upcoming · 即将开播</p>
+    <h1>Live.<br><em>实时。</em></h1>
+    <p class="hero-sub">内容在这里，不在别处。</p>
+  </div>
+  <div class="live-hero-right">
+    <div class="countdown-block">
+      <div class="countdown-label">距离开播还有</div>
+      <div class="countdown" id="countdown">-- : -- : --</div>
+      <div class="countdown-date">{nextDate}</div>
     </div>
   </div>
-)}
+</div>
 
 <!-- 本期主题 -->
 <section class="episode-section">
@@ -185,6 +164,77 @@ const nextDate = new Date(config.nextStream).toLocaleDateString('zh-CN', {
 </Layout>
 
 <script>
+  const STREAM_URL = 'http://localhost:8080/hls/stream.m3u8';
+  const CHECK_INTERVAL = 5000; // 每5秒检测一次
+
+  const liveMode  = document.getElementById('live-mode');
+  const liveHero  = document.getElementById('live-hero');
+  const liveVideo = document.getElementById('live-video') as HTMLVideoElement;
+
+  let isLive = false;
+  let hlsInstance: any = null;
+
+  // 启动 HLS 播放器
+  function startPlayer() {
+    if (!liveVideo) return;
+    if (liveVideo.canPlayType('application/vnd.apple.mpegurl')) {
+      liveVideo.src = STREAM_URL;
+      liveVideo.play().catch(() => {});
+    } else {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js';
+      s.onload = () => {
+        // @ts-ignore
+        if (window.Hls.isSupported()) {
+          // @ts-ignore
+          hlsInstance = new window.Hls({ liveSyncDurationCount: 3 });
+          hlsInstance.loadSource(STREAM_URL);
+          hlsInstance.attachMedia(liveVideo);
+          liveVideo.play().catch(() => {});
+        }
+      };
+      document.head.appendChild(s);
+    }
+  }
+
+  // 停止播放器
+  function stopPlayer() {
+    if (liveVideo) { liveVideo.pause(); liveVideo.src = ''; }
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+  }
+
+  // 切换到开播模式
+  function goLive() {
+    if (isLive) return;
+    isLive = true;
+    if (liveHero) liveHero.style.display = 'none';
+    if (liveMode) liveMode.style.display = 'block';
+    startPlayer();
+  }
+
+  // 切换到未开播模式
+  function goOffline() {
+    if (!isLive) return;
+    isLive = false;
+    if (liveMode) liveMode.style.display = 'none';
+    if (liveHero) liveHero.style.display = 'grid';
+    stopPlayer();
+  }
+
+  // 检测流是否在线
+  async function checkStream() {
+    try {
+      const res = await fetch(STREAM_URL, { method: 'HEAD', cache: 'no-store' });
+      if (res.ok) { goLive(); } else { goOffline(); }
+    } catch {
+      goOffline();
+    }
+  }
+
+  // 启动检测
+  checkStream();
+  setInterval(checkStream, CHECK_INTERVAL);
+
   // 倒计时
   const el = document.getElementById('countdown');
   const target = new Date('2026-03-20T20:00:00+08:00').getTime();
@@ -213,6 +263,63 @@ const nextDate = new Date(config.nextStream).toLocaleDateString('zh-CN', {
 </script>
 
 <style>
+  /* ── 开播模式 ── */
+  .live-mode {
+    max-width: 1080px;
+    margin: 0 auto;
+    width: 100%;
+    padding-top: 80px;
+  }
+  .live-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px 24px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 0;
+  }
+  .live-topbar-title {
+    font-family: var(--serif-en);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .live-topbar-title em { font-style: italic; color: var(--ink-light); }
+  .live-topbar-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #2a9a5a;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #2a9a5a;
+    animation: pulse-dot 1.5s ease infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(42,154,90,0.2); }
+    50%       { box-shadow: 0 0 0 5px rgba(42,154,90,0.1); }
+  }
+  .player-full { padding: 0 40px 0; }
+  .player-full .player-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background: #0d0d0d;
+  }
+  .player-full .player-wrap video,
+  .player-full .player-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
   /* ── Hero ── */
   .live-hero {
     display: grid;
@@ -340,11 +447,11 @@ const nextDate = new Date(config.nextStream).toLocaleDateString('zh-CN', {
     padding-top: 56.25%;
     background: #0d0d0d;
   }
-  .player-wrap iframe {
+  .player-wrap video {
     position: absolute;
     inset: 0;
     width: 100%; height: 100%;
-    border: none;
+    background: #0d0d0d;
   }
 
   /* ── 通用 section 结构 ── */

@@ -88,7 +88,7 @@ function detectEmbed(url: string | undefined, file: string | undefined, platform
             {embed.type === 'self' ? (
               <div class="video-player-wrap">
                 <video class="video-player" controls preload="metadata">
-                  <source src={video.data.file} type="video/mp4" />
+                  <source src={video.data.file?.startsWith('/') ? video.data.file : `/videos/${video.data.file}`} type="video/mp4" />
                 </video>
               </div>
             ) : embed.embedUrl ? (
